@@ -17,6 +17,8 @@
 #ifndef __HASHMAP_H__
 #define __HASHMAP_H__
 
+#include "utils.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -30,22 +32,22 @@
  * @param K Data type of key
  * @param V Data type of value. This must be a pointer type!
  * @param hasher A function that takes the key and returns an integer hash
- * @param key_comparer A function that compares the keys
+ * @param key_eql A function that compares the keys
  * @param key_cloner A function that clones the key. To copy by value, ignore it.
  */
-#define RAW_MAP_GENERATE(id, bucket_size, K, V, hasher, key_comparer, key_cloner) \
+#define RAW_MAP_GENERATE(id, bucket_size, K, V, hasher, key_eql, key_cloner) \
 	struct __##id##_cell \
 	{ \
 		K key; V value; \
 		struct __##id##_cell *next; \
 	}; \
-\
+ \
 	struct id##_map_t \
 	{ \
 		size_t size; \
 		struct __##id##_cell *b[bucket_size]; \
 	}; \
-\
+ \
 	void \
 	id##_for_each(struct id##_map_t *m, \
 				  int (*v)(K, V)) \
@@ -73,7 +75,7 @@
 		struct __##id##_cell *s = m->b[d]; \
 		do \
 		{ \
-			if (key_comparer(s->key, k)) \
+			if (key_eql(s->key, k)) \
 			{ \
 				V p = s->value; \
 				s->value = NULL; \
@@ -94,7 +96,7 @@
 		struct __##id##_cell *s = m->b[d]; \
 		do \
 		{ \
-			if (key_comparer(s->key, k)) \
+			if (key_eql(s->key, k)) \
 			{ \
 				return s->value; \
 			} \
@@ -132,7 +134,7 @@
 		struct __##id##_cell *s = m->b[d]; \
 		do \
 		{ \
-			if (key_comparer(s->key, k)) \
+			if (key_eql(s->key, k)) \
 			{ \
 				V p = s->value; \
 				s->value = v; \
@@ -151,11 +153,6 @@
 	}
 
 /**
- * A function that tests equality using the == operator
- */
-#define basic_compare(a, b) ((a) == (b))
-
-/**
  * Generates a hashmap with int as its key and a bucket_size of 256
  *
  * @param id A unique name for this map
@@ -163,7 +160,7 @@
  * @param hasher A function that takes the key and returns an integer hash
  */
 #define INT_MAP_GENERATE(id, V, hasher) \
-		RAW_MAP_GENERATE(id, 256, int, V, hasher, basic_compare,)
+		RAW_MAP_GENERATE(id, 256, int, V, hasher, !basic_compare,)
 
 /**
  * Generates a hashmap with char* as its key and a bucket_size of 256

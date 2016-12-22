@@ -41,9 +41,11 @@ main (void)
 	MAP_PUT_PAIR(hash, map, "B", "Bat");
 	printf("\n");
 	MAP_FOR_EACH(hash, map, &default_walker);
-	printf("Get hui (default \"A\") %s\n", MAP_GET_OR_DEFAULT(hash, map, "hui", "A"));
+	printf("\nGet hui (default \"A\") %s\n",
+			MAP_GET_OR_DEFAULT(hash, map, "hui", "A"));
 	printf("Does A exist? %d\n", MAP_HAS_KEY(hash, map, "A"));
 	printf("Does B exist? %d\n", MAP_HAS_KEY(hash, map, "B"));
+	printf("\nFinal size of map: %d\n", MAP_SIZE(map));
 	free(map);
 	return 0;
 }

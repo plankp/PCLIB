@@ -28,7 +28,7 @@
  * @param id An unique name for this map
  * @param bucket_size Size of bucket. Either base of 2 or a prime number
  * @param K Data type of key
- * @param V Data type of value
+ * @param V Data type of value. This must be a pointer type!
  * @param hasher A function that takes the key and returns an integer hash
  * @param key_comparer A function that compares the keys
  * @param key_cloner A function that clones the key. To copy by value, ignore it.
@@ -260,5 +260,14 @@
  * remaining elements.
  */
 #define MAP_FOR_EACH(id, map, visitor) id##_for_each(map, visitor)
+
+/**
+ * Returns the size of a map
+ *
+ * @param map The map itself
+ *
+ * @returns the size of the map
+ */
+#define MAP_SIZE(map) (map->size)
 
 #endif

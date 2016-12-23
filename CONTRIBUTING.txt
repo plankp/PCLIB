@@ -1,0 +1,15 @@
+# How to contribute
+
+Awesome! Glad you are reading this document!
+
+### Reporting Bugs
+
+Before starting to file a bug, check the issues to see if someone else already created it.
+Please include which header where you using, what were you trying to accomplish, and
+what was the error. Ways to reproduce the bug is also required.
+
+### Code Style
+
+Try to follow what it looks like from the file.
+Use tabs instead of spaces, each line should be less than 80 characters wide,
+spaces around binary operators.

@@ -23,6 +23,7 @@ int
 default_walker(char *key, char *val)
 {
 	printf("%s => %s\n", key, val);
+	return 1;
 }
 
 STR_MAP_GENERATE(hash, char *, djb2_hash);

@@ -60,7 +60,7 @@
 			do \
 			{ \
 				if (s->value == NULL) continue; \
-				if (!v(s->key, s->value)) break; \
+				if (v(s->key, s->value) != CONTINUE) break; \
 			} \
 			while (s = s->next, s != NULL); \
 		} \

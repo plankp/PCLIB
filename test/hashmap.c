@@ -1,17 +1,17 @@
+#include "hashmap.h"
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "hashmap.h"
-
 uint64_t
 djb2_hash(char *key)
 {
 	uint64_t hash = 5381;
 	int c;
-	while (c = *key++)
+	while ((c = *key++))
 	{
 		hash = (hash << 5) + hash + c;
 	}
@@ -19,11 +19,11 @@ djb2_hash(char *key)
 }
 
 static
-int
+loop_state_t
 default_walker(char *key, char *val)
 {
 	printf("%s => %s\n", key, val);
-	return 1;
+	return CONTINUE;
 }
 
 STR_MAP_GENERATE(hash, char *, djb2_hash);
@@ -46,7 +46,7 @@ main (void)
 			MAP_GET_OR_DEFAULT(hash, map, "hui", "A"));
 	printf("Does A exist? %d\n", MAP_HAS_KEY(hash, map, "A"));
 	printf("Does B exist? %d\n", MAP_HAS_KEY(hash, map, "B"));
-	printf("\nFinal size of map: %d\n", MAP_SIZE(map));
+	printf("\nFinal size of map: %zu\n", MAP_SIZE(map));
 	free(map);
 	return 0;
 }

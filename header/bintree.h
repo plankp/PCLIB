@@ -170,6 +170,7 @@ cont_cycle: \
 
 #define BINTREE_INSERT(id, tree, new_tree) id##_insert_tree(tree, new_tree)
 
-#define BINTREE_FOR_EACH(id, tree, visitor) id##_for_each(tree, visitor)
+#define BINTREE_FOR_EACH(id, tree, visitor) \
+	do id##_for_each(tree, visitor); while (0)
 
 #endif

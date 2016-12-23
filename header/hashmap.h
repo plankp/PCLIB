@@ -50,7 +50,7 @@
  \
 	void \
 	id##_for_each(struct id##_map_t *m, \
-				  int (*v)(K, V)) \
+				  loop_state_t (*v)(K, V)) \
 	{ \
 		size_t i; \
 		for (i = 0; i < bucket_size; ++i) \

@@ -26,11 +26,11 @@
 #define RAW_CLOSURE_GENERATE(id, B, R, ...) \
 	struct id##_closure_t \
 	{ \
-		R (*fptr)(B, ##__VA_ARGS__); \
+		R (*fptr)(B*, ##__VA_ARGS__); \
 		B block; \
 	}; \
  \
-	static inline R __##id##_closure_func(B, ##__VA_ARGS__); \
+	static inline R __##id##_closure_func(B*, ##__VA_ARGS__); \
  \
 	struct id##_closure_t \
 	init_##id##_closure(B block) \
@@ -43,7 +43,7 @@
  \
 	static inline \
 	R \
-	__##id##_closure_func(B self, ##__VA_ARGS__)
+	__##id##_closure_func(B *self, ##__VA_ARGS__)
 
 // ----- Generators -----
 
@@ -175,6 +175,6 @@
  * Consumers will always return void.
  *
  */
-#define GENERIC_CALL(self, ...) (self.fptr(self.block, ##__VA_ARGS__))
+#define GENERIC_CALL(self, ...) ((self)->fptr(&(self)->block, ##__VA_ARGS__))
 
 #endif

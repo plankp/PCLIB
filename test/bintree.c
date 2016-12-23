@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "bintree.h"
 
 #include <stdio.h>
@@ -16,6 +17,14 @@ djb2_hash(char *key)
 		hash = (hash << 5) + hash + c;
 	}
 	return hash;
+}
+
+static inline
+loop_state_t
+default_walker(char *key, int value)
+{
+	printf("%s: %d\n", key, value);
+	return CONTINUE;
 }
 
 STR_BINTREE_GENERATE(tr, int, djb2_hash);
@@ -41,5 +50,10 @@ main (void)
 		BINTREE_INSERT(tr, &d, &f);
 		BINTREE_INSERT(tr, &d, &g);
 	}
+	BINTREE_FOR_EACH(tr, &d, &default_walker);
+	printf("\n");
+	BINTREE_REMOVE(tr, &d, "g");
+	BINTREE_REMOVE(tr, &d, "b");
+	BINTREE_FOR_EACH(tr, &d, &default_walker);
 	return 0;
 }

@@ -22,4 +22,11 @@
  */
 #define basic_compare(a, b) ((a)-(b))
 
+typedef enum loop_state_t
+{
+	ABORT = 0,
+	CONTINUE = 1,
+	ABORT_AFTER_CYCLE = -1
+} loop_state_t;
+
 #endif

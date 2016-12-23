@@ -11,6 +11,7 @@ If you need any of the following, this is the right place for you:
 
 *  Hashmaps
 *  Closures
+*  Binary Tree
 
 ------
 

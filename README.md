@@ -10,9 +10,23 @@ It might (most likely will) not be efficient, but it should be easy to use.
 If you need any of the following, this is the right place for you:
 
 *  Vectors (Array lists)
+*  Bit arrays
 *  Hashmaps
 *  Closures (including consumers, predicates, and suppliers)
 *  Binary Tree
+
+## How to build this library
+
+Not tested on windows. CMake and a C99 compiler is needed.
+
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+This will create a library called `libpclib.a` which can be linked against your application.
 
 ------
 

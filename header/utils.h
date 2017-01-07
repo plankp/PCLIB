@@ -18,7 +18,7 @@
 #define __UTILS_H__
 
 /**
- * A function that tests equality using the == operator
+ * A function that tests equality
  */
 #define basic_compare(a, b) ((a)-(b))
 

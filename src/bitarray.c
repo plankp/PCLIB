@@ -96,3 +96,69 @@ bitarray_for_each(bitarray_t *arr, loop_state_t (*vis)(int))
 		if (vis(bitarray_get(arr, i)) != CONTINUE) break;
 	}
 }
+
+bitarray_t
+bitarray_and(bitarray_t *lhs, bitarray_t *rhs)
+{
+	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
+	bitarray_t arr = init_bitarray(new_size);
+
+	size_t i;
+	for (i = 0; i < new_size; ++i)
+	{
+		const int lb = bitarray_get(lhs, i);
+		const int rb = bitarray_get(rhs, i);
+		if (lb & rb) bitarray_set(&arr, i);
+	}
+
+	return arr;
+}
+
+bitarray_t
+bitarray_or(bitarray_t *lhs, bitarray_t *rhs)
+{
+	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
+	bitarray_t arr = init_bitarray(new_size);
+
+	size_t i;
+	for (i = 0; i < new_size; ++i)
+	{
+		const int lb = bitarray_get(lhs, i);
+		const int rb = bitarray_get(rhs, i);
+		if (lb | rb) bitarray_set(&arr, i);
+	}
+
+	return arr;
+}
+
+bitarray_t
+bitarray_xor(bitarray_t *lhs, bitarray_t *rhs)
+{
+	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
+	bitarray_t arr = init_bitarray(new_size);
+
+	size_t i;
+	for (i = 0; i < new_size; ++i)
+	{
+		const int lb = bitarray_get(lhs, i);
+		const int rb = bitarray_get(rhs, i);
+		if (lb ^ rb) bitarray_set(&arr, i);
+	}
+
+	return arr;
+}
+
+bitarray_t
+bitarray_not(bitarray_t *base)
+{
+	bitarray_t arr = init_bitarray(base->c);
+
+	size_t i;
+	for (i = 0; i < base->c; ++i)
+	{
+		const int b = bitarray_get(base, i);
+		if (!b) bitarray_set(&arr, i);
+	}
+
+	return arr;
+}

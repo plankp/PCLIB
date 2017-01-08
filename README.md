@@ -15,6 +15,7 @@ If you need any of the following, this is the right place for you:
 *  Hashmaps
 *  Closures (including consumers, predicates, and suppliers)
 *  Binary Tree
+*  Named param function
 
 ## How to build this library
 

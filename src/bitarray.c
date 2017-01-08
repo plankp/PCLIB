@@ -16,6 +16,13 @@
 
 #include "bitarray.h"
 
+static inline
+size_t
+compute_word_len(size_t bits)
+{
+	return bits / 32 + (bits % 32 == 0 ? 0 : 1);
+}
+
 bitarray_t
 init_bitarray(size_t bits)
 {
@@ -27,7 +34,7 @@ init_bitarray(size_t bits)
 		};
 	}
 
-	const size_t cap = bits / 32 + (bits % 32 == 0 ? 0 : 1);
+	const size_t cap = compute_word_len(bits);
 	return (bitarray_t) {
 		.c=bits, .b=calloc(cap, sizeof (uint32_t))
 	};
@@ -102,14 +109,14 @@ bitarray_and(bitarray_t *lhs, bitarray_t *rhs)
 {
 	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
 	bitarray_t arr = init_bitarray(new_size);
+	const size_t minwordlen = compute_word_len(
+			lhs->c < rhs->c ? lhs->c : rhs->c);
 
 	size_t i;
-	for (i = 0; i < new_size; ++i)
-	{
-		const int lb = bitarray_get(lhs, i);
-		const int rb = bitarray_get(rhs, i);
-		if (lb & rb) bitarray_set(&arr, i);
-	}
+	for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] & rhs->b[i];
+
+	// The remaining bits will guaranteed to be false since both
+	// true is required to become true
 
 	return arr;
 }
@@ -117,48 +124,55 @@ bitarray_and(bitarray_t *lhs, bitarray_t *rhs)
 bitarray_t
 bitarray_or(bitarray_t *lhs, bitarray_t *rhs)
 {
-	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
-	bitarray_t arr = init_bitarray(new_size);
-
-	size_t i;
-	for (i = 0; i < new_size; ++i)
+	bitarray_t arr;
+	size_t i, minwordlen;
+	if (lhs->c > rhs->c)
 	{
-		const int lb = bitarray_get(lhs, i);
-		const int rb = bitarray_get(rhs, i);
-		if (lb | rb) bitarray_set(&arr, i);
+		arr = init_bitarray(lhs->c);
+		minwordlen = compute_word_len(rhs->c);
+		memmove(arr.b + minwordlen, lhs->b + minwordlen,
+				(compute_word_len(lhs->c) - minwordlen) * sizeof (uint32_t));
 	}
-
+	else
+	{
+		arr = init_bitarray(rhs->c);
+		minwordlen = compute_word_len(lhs->c);
+		memmove(arr.b + minwordlen, lhs->b + minwordlen,
+				(compute_word_len(rhs->c) - minwordlen) * sizeof (uint32_t));
+	}
+	for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] | rhs->b[i];
 	return arr;
 }
 
 bitarray_t
 bitarray_xor(bitarray_t *lhs, bitarray_t *rhs)
 {
-	const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
-	bitarray_t arr = init_bitarray(new_size);
-
-	size_t i;
-	for (i = 0; i < new_size; ++i)
+	bitarray_t arr;
+	size_t i, minwordlen;
+	if (lhs->c > rhs->c)
 	{
-		const int lb = bitarray_get(lhs, i);
-		const int rb = bitarray_get(rhs, i);
-		if (lb ^ rb) bitarray_set(&arr, i);
+		arr = init_bitarray(lhs->c);
+		minwordlen = compute_word_len(rhs->c);
+		memmove(arr.b + minwordlen, lhs->b + minwordlen,
+				(compute_word_len(lhs->c) - minwordlen) * sizeof (uint32_t));
 	}
-
+	else
+	{
+		arr = init_bitarray(rhs->c);
+		minwordlen = compute_word_len(lhs->c);
+		memmove(arr.b + minwordlen, lhs->b + minwordlen,
+				(compute_word_len(rhs->c) - minwordlen) * sizeof (uint32_t));
+	}
+	for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] ^ rhs->b[i];
 	return arr;
+
 }
 
 bitarray_t
 bitarray_not(bitarray_t *base)
 {
 	bitarray_t arr = init_bitarray(base->c);
-
-	size_t i;
-	for (i = 0; i < base->c; ++i)
-	{
-		const int b = bitarray_get(base, i);
-		if (!b) bitarray_set(&arr, i);
-	}
-
+	size_t i, wordlen = compute_word_len(base->c);
+	for (i = 0; i < wordlen; ++i) arr.b[i] = ~base->b[i];
 	return arr;
 }

@@ -33,12 +33,42 @@ extern "C"
 {
 #endif
 
+/**
+ * Creates a new optional value. If this value is equal to NULL, this optional
+ * is set to none. In other words, absence of value.
+ *
+ * @param value The value being wrapped
+ *
+ * @returns The null wrapper
+ */
 optional_t init_optional (void *value);
 
+/**
+ * Checks to see if the optional has a value or not
+ *
+ * @param opt The optional value
+ *
+ * @returns True if value exist, false otherwise
+ */
 _Bool has_value (optional_t *opt);
 
+/**
+ * Checks to see if the optional is none
+ *
+ * @param opt The optional value
+ *
+ * @returns True if value does not exist, false otherwise
+ */
 _Bool is_empty (optional_t *opt);
 
+/**
+ * Returns the value of the optional wrapper. Returns NULL if optional was set
+ * to none.
+ *
+ * @param opt The optional value
+ *
+ * @returns The underlying value. NULL if value is absent.
+ */
 const void *get_optional (optional_t *opt);
 
 #ifdef __cplusplus

@@ -47,8 +47,8 @@ bool init_arrlist             (array_list * const list, size_t data_size);
 void free_arrlist             (array_list * const list);
 
 /**
- * Clears the array list by setting the size to zero. To attempt to release
- * the underlying storage slots, call arrlist_compact immediately after.
+ * Clears the array list by setting the size to zero. To release the
+ * underlying storage slots, call arrlist_compact immediately after.
  *
  * @param list - Pointer to initialized array list
  */

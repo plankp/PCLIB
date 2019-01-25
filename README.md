@@ -9,6 +9,7 @@ It might (most likely will) not be efficient, but it should be easy to use.
 
 If you need any of the following, this is the right place for you:
 
+*  String buffers
 *  Array lists
 *  Hash maps
 *  Bit arrays

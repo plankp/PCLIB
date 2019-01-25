@@ -113,7 +113,7 @@ bool strbuf_ensure_capacity
   }
 
   /* resize buffer to at least n */
-  size_t new_cap = (((n + 1) / 16) + 1) * 16;
+  size_t new_cap = STRBUF_GROW(n);
   char * new_mem = realloc(buffer->mem, new_cap * sizeof(char));
   if (new_mem == NULL)
   {

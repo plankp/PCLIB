@@ -90,7 +90,7 @@ bool arrlist_ensure_capacity
   }
 
   /* resize list to at least n */
-  size_t new_cap = ((n / 16) + 1) * 16;
+  size_t new_cap = ARRLIST_GROW(n);
   char * new_mem = realloc(list->mem, new_cap * list->blk);
   if (new_mem == NULL)
   {

@@ -20,6 +20,33 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * The growth function for the hash map.
+ *
+ * By default, the capacity is scaled to the next multiple of 16.
+ *
+ * @param n - The precomputed new capacity
+ *
+ * @return value >= n
+ */
+#ifndef HMAP_GROW /* (size_t n) */
+#define HMAP_GROW(n) ((((n) / 16) + 1) * 16)
+#endif
+
+/**
+ * The probe function for locating buckets
+ *
+ * By default, linear probing is used (base hash + iteration)
+ *
+ * @param h - Base hash
+ * @param k - Iteration
+ *
+ * @return potential bucket location
+ */
+#ifndef HMAP_PROBE /* (unsigned long h, size_t k) */
+#define HMAP_PROBE(h, k) ((h) + (k))
+#endif
+
 typedef unsigned long (hash_func)(void const *);
 typedef bool (key_eq)(void const *, void const *);
 

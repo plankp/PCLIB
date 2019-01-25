@@ -20,6 +20,19 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * The growth function for the string buffer.
+ *
+ * By default, the capacity is scaled to the next multiple of 16.
+ *
+ * @param n - The precomputed new capacity
+ *
+ * @return value >= n
+ */
+#ifndef STRBUF_GROW /* (size_t n) */
+#define STRBUF_GROW(n) ((((n) / 16) + 1) * 16)
+#endif
+
 typedef struct string_buffer
 {
   size_t len;

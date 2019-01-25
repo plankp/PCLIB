@@ -1,13 +1,13 @@
-/* 
+/*
  * Copyright (c) 2019 Paul Teng
- * 
- * PCLIB is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU Lesser General Public License as   
+ *
+ * PCLIB is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, version 3.
  *
- * PCLIB is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * PCLIB is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -35,24 +35,21 @@ void rehash_move
   for (size_t i = 0; i < src_cap; ++i)
   {
     void * pair = src[i].pair;
-    unsigned long hashcode = hasher == NULL ? src[i].hash : hasher(pair);
-    size_t offset = hashcode % dst_cap;
+    unsigned long const hashcode = hasher == NULL ? src[i].hash : hasher(pair);
 
-    map_entry *slot = &dst[offset];
-    while (slot->pair != NULL)
+    for (size_t k = 0; ; ++k)
     {
-      /*
-       * no need to check if two have same key since
-       * map cannot have this (hmap_put handles this)
-       */
+      size_t const offset = HMAP_PROBE(hashcode, k);
+      map_entry * slot = &dst[offset % dst_cap];
 
-      /* linear probing, +1 and try again */
-      slot = &src[++offset % dst_cap];
+      if (slot->pair == NULL)
+      {
+        /* place pair into slot */
+        slot->hash = hashcode;
+        slot->pair = pair;
+        break;
+      }
     }
-
-    /* place pair into slot */
-    slot->hash = hashcode;
-    slot->pair = pair;
   }
 }
 
@@ -106,7 +103,7 @@ bool hmap_ensure_capacity
     return true;
   }
 
-  size_t const new_cap = ((n / 16) + 1) * 16;
+  size_t const new_cap = HMAP_GROW(n);
   map_entry * new_mem = malloc(new_cap * sizeof(map_entry));
   if (new_mem == NULL)
   {
@@ -139,32 +136,34 @@ bool hmap_put
 
   unsigned long hashcode = map->hasher(pair);
   size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
 
-  map_entry * slot = &map->mem[offset];
-  while (slot->pair != NULL)
+  for (size_t k = 0; ; ++k)
   {
-    /* check if the slot has same key */
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+
+    if (slot->pair == NULL)
+    {
+      /* place pair into empty slot */
+      slot->hash = hashcode;
+      slot->pair = pair;
+      ++map->len;
+      return true;
+    }
+
     if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
     {
-      /* if it does, replace the slot, and length is not changed */
-      --map->len;
+      /* overwrite slot */
       if (repl != NULL)
       {
         *repl = slot->pair;
       }
-      break;
+      slot->hash = hashcode;
+      slot->pair = pair;
+      return true;
     }
-
-    /* linear probing, +1 and try again */
-    slot = &map->mem[++offset % cap];
   }
-
-  /* place pair into slot */
-  slot->hash = hashcode;
-  slot->pair = pair;
-  ++map->len;
-  return true;
+  return false;
 }
 
 bool hmap_put_if_absent
@@ -183,27 +182,28 @@ bool hmap_put_if_absent
 
   unsigned long hashcode = map->hasher(pair);
   size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
 
-  map_entry * slot = &map->mem[offset];
-  while (slot->pair != NULL)
+  for (size_t k = 0; ; ++k)
   {
-    /* check if the slot has same key */
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+
+    if (slot->pair == NULL)
     {
-      /* if it does, do nothing since its put if absent */
+      /* place pair into empty slot */
+      slot->hash = hashcode;
+      slot->pair = pair;
+      ++map->len;
       return true;
     }
 
-    /* linear probing, +1 and try again */
-    slot = &map->mem[++offset % cap];
+    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
+    {
+      /* put if absent, so do nothing and return false */
+      return false;
+    }
   }
-
-  /* place pair into slot */
-  slot->hash = hashcode;
-  slot->pair = pair;
-  ++map->len;
-  return true;
+  return false;
 }
 
 void * hmap_remove
@@ -217,25 +217,26 @@ void * hmap_remove
 
   unsigned long hashcode = map->hasher(pair);
   size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
 
-  map_entry * slot = &map->mem[offset];
-  while (slot->pair != NULL)
+  for (size_t k = 0; ; ++k)
   {
-    /* check if the slot has same key */
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+
+    if (slot->pair == NULL)
+    {
+      /* does not exist, nothing to remove */
+      return NULL;
+    }
+
     if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
     {
-      /* if it does, remove the slot */
+      /* it exists, remove the slot */
       void * old = slot->pair;
       slot->pair = NULL;
       return old;
     }
-
-    /* linear probing, +1 and try again */
-    slot = &map->mem[++offset % cap];
   }
-
-  /* nothing to remove */
   return NULL;
 }
 
@@ -250,56 +251,33 @@ void * hmap_replace
 
   unsigned long hashcode = map->hasher(pair);
   size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
 
-  map_entry * slot = &map->mem[offset];
-  while (slot->pair != NULL)
+  for (size_t k = 0; ; ++k)
   {
-    /* check if the slot has same key */
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+
+    if (slot->pair == NULL)
+    {
+      /* does not exist, nothing to replace */
+      return NULL;
+    }
+
     if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
     {
-      /* if it does, replace the slot */
+      /* it exists, replace the slot */
       void * old = slot->pair;
       slot->pair = pair;
       return old;
     }
-
-    /* linear probing, +1 and try again */
-    slot = &map->mem[++offset % cap];
   }
-
-  /* nothing to replace with */
   return NULL;
 }
 
 bool hmap_has_key
 (hash_map * restrict const map, void * restrict pair)
 {
-  if (pair == NULL || map->len < 1)
-  {
-    /* no such key */
-    return false;
-  }
-
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
-
-  map_entry slot = map->mem[offset];
-  while (slot.pair != NULL)
-  {
-    /* check if the slot has same key */
-    if (slot.hash == hashcode && map->key_equal(slot.pair, pair))
-    {
-      return true;
-    }
-
-    /* linear probing, +1 and try again */
-    slot = map->mem[++offset % cap];
-  }
-
-  /* does not exist */
-  return false;
+  return hmap_get(map, pair) != NULL;
 }
 
 void * hmap_get
@@ -312,22 +290,22 @@ void * hmap_get
 
   unsigned long hashcode = map->hasher(pair);
   size_t const cap = map->cap;
-  size_t offset = hashcode % cap;
 
-  map_entry slot = map->mem[offset];
-  while (slot.pair != NULL)
+  for (size_t k = 0; ; ++k)
   {
-    /* check if the slot has same key */
-    if (slot.hash == hashcode && map->key_equal(slot.pair, pair))
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+    if (slot->pair == NULL)
     {
-      return slot.pair;
+      /* does not exist */
+      return NULL;
     }
 
-    /* linear probing, +1 and try again */
-    slot = map->mem[++offset % cap];
+    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
+    {
+      return slot->pair;
+    }
   }
-
-  /* does not exist */
   return NULL;
 }
 

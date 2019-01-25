@@ -30,7 +30,7 @@
  * @return value >= n
  */
 #ifndef STRBUF_GROW /* (size_t n) */
-#define STRBUF_GROW(n) ((((n + 1) / 16) + 1) * 16)
+#define STRBUF_GROW(n) ((((n) / 16) + 1) * 16)
 #endif
 
 typedef struct string_buffer

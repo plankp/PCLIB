@@ -9,10 +9,10 @@ It might (most likely will) not be efficient, but it should be easy to use.
 
 If you need any of the following, this is the right place for you:
 
-*  Vectors (Array lists)
-*  Optional type (null wrapper)
+*  Array lists
+*  Hash maps
 *  Bit arrays
-*  Hashmaps
+*  Optional type (null wrapper)
 *  Closures (including consumers, predicates, and suppliers)
 *  Binary Tree
 *  Named param function

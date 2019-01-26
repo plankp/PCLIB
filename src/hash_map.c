@@ -19,6 +19,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @param dst - bucket destination
+ * @param src - bucket source
+ * @param dst_cap - capacity of dst
+ * @param src_cap - capacity of src
+ * @param hasher - hash function, use old hashcode if NULL
+ */
 static
 void rehash_move
 (map_entry * restrict dst, map_entry * restrict src,
@@ -53,6 +60,13 @@ void rehash_move
   }
 }
 
+/**
+ * @param map - this pointer
+ * @param pair - search by key
+ * @param out_hash - outputs calculated hashcode; ignore if NULL
+ *
+ * @return vacant slot or slot with the same key
+ */
 static
 map_entry * find_bucket
 (hash_map * restrict const map, void * restrict pair, unsigned long * restrict out_hash)

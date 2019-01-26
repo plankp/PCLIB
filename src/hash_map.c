@@ -53,6 +53,32 @@ void rehash_move
   }
 }
 
+static
+map_entry * find_bucket
+(hash_map * restrict const map, void * restrict pair, unsigned long * restrict out_hash)
+{
+  unsigned long const hashcode = map->hasher(pair);
+  if (out_hash != NULL)
+  {
+    *out_hash = hashcode;
+  }
+
+  size_t const cap = map->cap;
+  for (size_t k = 0; ; ++k)
+  {
+    size_t const offset = HMAP_PROBE(hashcode, k);
+    map_entry * slot = &map->mem[offset % cap];
+
+    /* if slot was vacant or if the slot has same key */
+    if ((slot->pair == NULL)
+      || (slot->hash == hashcode && map->key_equal(slot->pair, pair)))
+    {
+      return slot;
+    }
+  }
+  return NULL;
+}
+
 bool init_hmap
 (hash_map * const map, hash_func * hasher, key_eq * key_equal)
 {
@@ -134,36 +160,26 @@ bool hmap_put
     return false;
   }
 
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
+  unsigned long hashcode;
+  map_entry * slot = find_bucket(map, pair, &hashcode);
 
-  for (size_t k = 0; ; ++k)
+  if (slot->pair == NULL)
   {
-    size_t const offset = HMAP_PROBE(hashcode, k);
-    map_entry * slot = &map->mem[offset % cap];
-
-    if (slot->pair == NULL)
-    {
-      /* place pair into empty slot */
-      slot->hash = hashcode;
-      slot->pair = pair;
-      ++map->len;
-      return true;
-    }
-
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
-    {
-      /* overwrite slot */
-      if (repl != NULL)
-      {
-        *repl = slot->pair;
-      }
-      slot->hash = hashcode;
-      slot->pair = pair;
-      return true;
-    }
+    /* one less empty slot */
+    ++map->len;
   }
-  return false;
+  else if (repl != NULL)
+  {
+    /*
+     * else means slot was occupied with the same key.
+     * save overwrite if repl != NULL
+     */
+    *repl = slot->pair;
+  }
+
+  slot->hash = hashcode;
+  slot->pair = pair;
+  return true;
 }
 
 bool hmap_put_if_absent
@@ -180,29 +196,18 @@ bool hmap_put_if_absent
     return false;
   }
 
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
+  unsigned long hashcode;
+  map_entry * slot = find_bucket(map, pair, &hashcode);
 
-  for (size_t k = 0; ; ++k)
+  if (slot->pair == NULL)
   {
-    size_t const offset = HMAP_PROBE(hashcode, k);
-    map_entry * slot = &map->mem[offset % cap];
-
-    if (slot->pair == NULL)
-    {
-      /* place pair into empty slot */
-      slot->hash = hashcode;
-      slot->pair = pair;
-      ++map->len;
-      return true;
-    }
-
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
-    {
-      /* put if absent, so do nothing and return false */
-      return false;
-    }
+    /* place pair into empty slot */
+    slot->hash = hashcode;
+    slot->pair = pair;
+    ++map->len;
+    return true;
   }
+
   return false;
 }
 
@@ -215,28 +220,17 @@ void * hmap_remove
     return NULL;
   }
 
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
+  map_entry * slot = find_bucket(map, pair, NULL);
 
-  for (size_t k = 0; ; ++k)
+  if (slot->pair != NULL)
   {
-    size_t const offset = HMAP_PROBE(hashcode, k);
-    map_entry * slot = &map->mem[offset % cap];
-
-    if (slot->pair == NULL)
-    {
-      /* does not exist, nothing to remove */
-      return NULL;
-    }
-
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
-    {
-      /* it exists, remove the slot */
-      void * old = slot->pair;
-      slot->pair = NULL;
-      return old;
-    }
+    /* key exists, remove the slot */
+    void * old = slot->pair;
+    slot->pair = NULL;
+    return old;
   }
+
+  /* does not exist, nothing to remove */
   return NULL;
 }
 
@@ -249,28 +243,17 @@ void * hmap_replace
     return NULL;
   }
 
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
+  map_entry * slot = find_bucket(map, pair, NULL);
 
-  for (size_t k = 0; ; ++k)
+  if (slot->pair != NULL)
   {
-    size_t const offset = HMAP_PROBE(hashcode, k);
-    map_entry * slot = &map->mem[offset % cap];
-
-    if (slot->pair == NULL)
-    {
-      /* does not exist, nothing to replace */
-      return NULL;
-    }
-
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
-    {
-      /* it exists, replace the slot */
-      void * old = slot->pair;
-      slot->pair = pair;
-      return old;
-    }
+    /* key exists, replace the slot */
+    void * old = slot->pair;
+    slot->pair = pair;
+    return old;
   }
+
+  /* does not exist, nothing to replace */
   return NULL;
 }
 
@@ -288,25 +271,7 @@ void * hmap_get
     return NULL;
   }
 
-  unsigned long hashcode = map->hasher(pair);
-  size_t const cap = map->cap;
-
-  for (size_t k = 0; ; ++k)
-  {
-    size_t const offset = HMAP_PROBE(hashcode, k);
-    map_entry * slot = &map->mem[offset % cap];
-    if (slot->pair == NULL)
-    {
-      /* does not exist */
-      return NULL;
-    }
-
-    if (slot->hash == hashcode && map->key_equal(slot->pair, pair))
-    {
-      return slot->pair;
-    }
-  }
-  return NULL;
+  return find_bucket(map, pair, NULL)->pair;
 }
 
 void * hmap_get_or_default

@@ -69,7 +69,7 @@ void rehash_move
  */
 static
 map_entry * find_bucket
-(hash_map * restrict const map, void * restrict pair, unsigned long * restrict out_hash)
+(hash_map const * restrict const map, void const * restrict pair, unsigned long * restrict out_hash)
 {
   unsigned long const hashcode = map->hasher(pair);
   if (out_hash != NULL)
@@ -272,13 +272,13 @@ void * hmap_replace
 }
 
 bool hmap_has_key
-(hash_map * restrict const map, void * restrict pair)
+(hash_map const * restrict const map, void const * restrict pair)
 {
   return hmap_get(map, pair) != NULL;
 }
 
 void * hmap_get
-(hash_map * restrict const map, void * restrict pair)
+(hash_map const * restrict const map, void const * restrict pair)
 {
   if (pair == NULL || map->len < 1)
   {
@@ -289,7 +289,7 @@ void * hmap_get
 }
 
 void * hmap_get_or_default
-(hash_map * restrict const map, void * restrict pair)
+(hash_map const * restrict const map, void * restrict pair)
 {
   void * ptr = hmap_get(map, pair);
   if (ptr == NULL)
@@ -322,7 +322,7 @@ bool hmap_rehash
 }
 
 void hmap_foreach
-(hash_map * const map, void (* it)(void const *))
+(hash_map const * const map, void (* it)(void const *))
 {
   for (size_t i = 0; i < map->cap; ++i)
   {
@@ -335,13 +335,13 @@ void hmap_foreach
 }
 
 size_t hmap_size
-(hash_map * const map)
+(hash_map const * const map)
 {
   return map->len;
 }
 
 size_t hmap_capacity
-(hash_map * const map)
+(hash_map const * const map)
 {
   return map->cap;
 }

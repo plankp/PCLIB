@@ -157,7 +157,7 @@ void * hmap_remove          (hash_map * restrict const map, void * restrict pair
  *
  * @return true if such pair exists, false otherwise
  */
-bool hmap_has_key           (hash_map * restrict const map, void * restrict pair);
+bool hmap_has_key           (hash_map const * restrict const map, void const * restrict pair);
 
 /**
  * Retrieves a pair with the specified key
@@ -167,7 +167,7 @@ bool hmap_has_key           (hash_map * restrict const map, void * restrict pair
  *
  * @return Pointer to such pair or NULL if no such pair exists
  */
-void * hmap_get             (hash_map * restrict const map, void * restrict pair);
+void * hmap_get             (hash_map const * restrict const map, void const * restrict pair);
 
 /**
  * Retrieves a pair with the specified key or the default value if no such
@@ -178,7 +178,7 @@ void * hmap_get             (hash_map * restrict const map, void * restrict pair
  *
  * @return Pointer to such pair or default value if no such pair exists
  */
-void * hmap_get_or_default  (hash_map * restrict const map, void * restrict pair);
+void * hmap_get_or_default  (hash_map const * restrict const map, void * restrict pair);
 
 /**
  * Forces the map to rehash all pairs with the new hash function. Internal
@@ -199,7 +199,7 @@ bool hmap_rehash            (hash_map * const map, hash_func * hasher);
  * @param map - Pointer to initialized hash map
  * @param it - An action to be performed on each pair
  */
-void hmap_foreach           (hash_map * const map, void (* it)(void const *));
+void hmap_foreach           (hash_map const * const map, void (* it)(void const *));
 
 /**
  * Returns the size of the hash map
@@ -208,7 +208,7 @@ void hmap_foreach           (hash_map * const map, void (* it)(void const *));
  *
  * @return size of the hash map
  */
-size_t hmap_size            (hash_map * const map);
+size_t hmap_size            (hash_map const * const map);
 
 /**
  * Returns the capacity of the hash map
@@ -217,6 +217,6 @@ size_t hmap_size            (hash_map * const map);
  *
  * @return capacity of the hash map
  */
-size_t hmap_capacity        (hash_map * const map);
+size_t hmap_capacity        (hash_map const * const map);
 
 #endif

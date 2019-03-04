@@ -54,7 +54,6 @@ void init_strbuf            (string_buffer * const buffer);
  */
 void free_strbuf            (string_buffer * const buffer);
 
-
 /**
  * Duplicates the internal string.
  *
@@ -62,7 +61,7 @@ void free_strbuf            (string_buffer * const buffer);
  *
  * @return duplicated string, must be freed later
  */
-char * strbuf_copy          (string_buffer * const buffer);
+char * strbuf_copy          (string_buffer const * const buffer);
 
 /**
  * Duplicates the internal string then frees the string buffer, making it the
@@ -143,7 +142,7 @@ bool strbuf_append_nstr     (string_buffer * restrict const buffer,
  *
  * @return size of the string buffer
  */
-size_t strbuf_size          (string_buffer * const buffer);
+size_t strbuf_size          (string_buffer const * const buffer);
 
 /**
  * Returns the capacity of the string buffer
@@ -152,7 +151,7 @@ size_t strbuf_size          (string_buffer * const buffer);
  *
  * @return capacity of the string buffer
  */
-size_t strbuf_capacity      (string_buffer * const buffer);
+size_t strbuf_capacity      (string_buffer const * const buffer);
 
 /**
  * Returns a pointer to the first character
@@ -161,6 +160,6 @@ size_t strbuf_capacity      (string_buffer * const buffer);
  *
  * @return pointer to the first character, must not be freed
  */
-char * strbuf_data          (string_buffer * const buffer);
+char * strbuf_data          (string_buffer const * const buffer);
 
 #endif

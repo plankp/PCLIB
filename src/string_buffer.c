@@ -41,7 +41,7 @@ void free_strbuf
 }
 
 char * strbuf_copy
-(string_buffer * const buffer)
+(string_buffer const * const buffer)
 {
   size_t length = buffer->len;
   char * cpy = malloc((length + 1) * sizeof(char));
@@ -158,19 +158,19 @@ bool strbuf_append_str
 }
 
 size_t strbuf_size
-(string_buffer * const buffer)
+(string_buffer const * const buffer)
 {
   return buffer->len;
 }
 
 size_t strbuf_capacity
-(string_buffer * const buffer)
+(string_buffer const * const buffer)
 {
   return buffer->cap;
 }
 
 char * strbuf_data
-(string_buffer * const buffer)
+(string_buffer const * const buffer)
 {
   return buffer->mem == NULL ? "" : buffer->mem;
 }

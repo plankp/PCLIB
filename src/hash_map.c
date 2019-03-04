@@ -41,7 +41,7 @@ void rehash_move
 
   for (size_t i = 0; i < src_cap; ++i)
   {
-    void * pair = src[i].pair;
+    void const * pair = src[i].pair;
     unsigned long const hashcode = hasher == NULL ? src[i].hash : hasher(pair);
 
     for (size_t k = 0; ; ++k)
@@ -161,7 +161,7 @@ bool hmap_ensure_capacity
 }
 
 bool hmap_put
-(hash_map * restrict const map, void * restrict pair, void ** restrict repl)
+(hash_map * restrict const map, void const * restrict pair, void const ** restrict repl)
 {
   if (pair == NULL)
   {
@@ -197,7 +197,7 @@ bool hmap_put
 }
 
 bool hmap_put_if_absent
-(hash_map * restrict const map, void * restrict pair)
+(hash_map * restrict const map, void const * restrict pair)
 {
   if (pair == NULL)
   {
@@ -225,8 +225,8 @@ bool hmap_put_if_absent
   return false;
 }
 
-void * hmap_remove
-(hash_map * restrict const map, void * restrict pair)
+void const * hmap_remove
+(hash_map * restrict const map, void const * restrict pair)
 {
   if (pair == NULL || map->len < 1)
   {
@@ -239,7 +239,7 @@ void * hmap_remove
   if (slot->pair != NULL)
   {
     /* key exists, remove the slot */
-    void * old = slot->pair;
+    void const * old = slot->pair;
     slot->pair = NULL;
     return old;
   }
@@ -248,8 +248,8 @@ void * hmap_remove
   return NULL;
 }
 
-void * hmap_replace
-(hash_map * restrict const map, void * restrict pair)
+void const * hmap_replace
+(hash_map * restrict const map, void const * restrict pair)
 {
   if (pair == NULL || map->len < 1)
   {
@@ -262,7 +262,7 @@ void * hmap_replace
   if (slot->pair != NULL)
   {
     /* key exists, replace the slot */
-    void * old = slot->pair;
+    void const * old = slot->pair;
     slot->pair = pair;
     return old;
   }
@@ -277,7 +277,7 @@ bool hmap_has_key
   return hmap_get(map, pair) != NULL;
 }
 
-void * hmap_get
+void const * hmap_get
 (hash_map const * restrict const map, void const * restrict pair)
 {
   if (pair == NULL || map->len < 1)
@@ -288,10 +288,10 @@ void * hmap_get
   return find_bucket(map, pair, NULL)->pair;
 }
 
-void * hmap_get_or_default
-(hash_map const * restrict const map, void * restrict pair)
+void const * hmap_get_or_default
+(hash_map const * restrict const map, void const * restrict pair)
 {
-  void * ptr = hmap_get(map, pair);
+  void const * ptr = hmap_get(map, pair);
   if (ptr == NULL)
   {
     return pair;

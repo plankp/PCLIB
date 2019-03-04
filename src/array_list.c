@@ -103,7 +103,7 @@ bool arrlist_ensure_capacity
 }
 
 bool arrlist_add
-(array_list * restrict const list, void * restrict el)
+(array_list * restrict const list, void const * restrict el)
 {
   if (!arrlist_ensure_capacity(list, list->len + 1))
   {
@@ -116,7 +116,7 @@ bool arrlist_add
 }
 
 bool arrlist_insert
-(array_list * restrict const list, size_t index, void * restrict el)
+(array_list * restrict const list, size_t index, void const * restrict el)
 {
   size_t len = list->len;
   if (index > len)
@@ -144,7 +144,7 @@ bool arrlist_insert
 }
 
 bool arrlist_set
-(array_list * restrict const list, size_t index, void * restrict el, void * restrict out)
+(array_list * restrict const list, size_t index, void const * restrict el, void * restrict out)
 {
   if (index < list->len)
   {
@@ -182,7 +182,7 @@ bool arrlist_remove
 }
 
 void arrlist_foreach
-(array_list * const list, void (* it)(void const *))
+(array_list const * const list, void (* it)(void const *))
 {
   for (size_t i = 0; i < list->len; ++i)
   {
@@ -191,7 +191,7 @@ void arrlist_foreach
 }
 
 void const * arrlist_get
-(array_list * const list, size_t index)
+(array_list const * const list, size_t index)
 {
   if (index < list->len)
   {
@@ -202,19 +202,19 @@ void const * arrlist_get
 }
 
 size_t arrlist_size
-(array_list * const list)
+(array_list const * const list)
 {
   return list->len;
 }
 
 size_t arrlist_capacity
-(array_list * const list)
+(array_list const * const list)
 {
   return list->cap;
 }
 
 bool arrlist_push
-(array_list * restrict const list, void * restrict el)
+(array_list * restrict const list, void const * restrict el)
 {
   return arrlist_add(list, el);
 }

@@ -97,7 +97,7 @@ bool arrlist_ensure_capacity  (array_list * const list, size_t n);
  * @return true if item was successfully added
  */
 bool arrlist_add              (array_list * restrict const list,
-                               void * restrict el);
+                               void const * restrict el);
 
 /**
  * Inserts an item to a specific index of the list. Behaviour is undefined if
@@ -112,7 +112,7 @@ bool arrlist_add              (array_list * restrict const list,
  */
 bool arrlist_insert           (array_list * restrict const list,
                                size_t index,
-                               void * restrict el);
+                               void const * restrict el);
 
 /**
  * Replaces an item at a specific index of the list. Behaviour is undefined if
@@ -128,7 +128,7 @@ bool arrlist_insert           (array_list * restrict const list,
  */
 bool arrlist_set              (array_list * restrict const list,
                                size_t index,
-                               void * restrict el,
+                               void const * restrict el,
                                void * restrict out);
 
 /**
@@ -154,7 +154,7 @@ bool arrlist_remove           (array_list * restrict const list,
  * @param list - Pointer to initialized array list
  * @param it - An action to be performed on each item
  */
-void arrlist_foreach          (array_list * const list,
+void arrlist_foreach          (array_list const * const list,
                                void (* it)(void const *));
 
 /**
@@ -165,7 +165,7 @@ void arrlist_foreach          (array_list * const list,
  *
  * @return Pointer to the item, NULL if index specified was out of bounds
  */
-void const * arrlist_get      (array_list * const list, size_t index);
+void const * arrlist_get      (array_list const * const list, size_t index);
 
 /**
  * Returns the size of the array list
@@ -174,7 +174,7 @@ void const * arrlist_get      (array_list * const list, size_t index);
  *
  * @return size of the array list
  */
-size_t arrlist_size           (array_list * const list);
+size_t arrlist_size           (array_list const * const list);
 
 /**
  * Returns the capacity of the array list
@@ -183,13 +183,13 @@ size_t arrlist_size           (array_list * const list);
  *
  * @return capacity of the array list
  */
-size_t arrlist_capacity       (array_list * const list);
+size_t arrlist_capacity       (array_list const * const list);
 
 /**
  * (same as arrlist_add)
  */
 bool arrlist_push             (array_list * restrict const list,
-                               void * restrict el);
+                               void const * restrict el);
 
 /**
  * Removes the last item from the list.

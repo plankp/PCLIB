@@ -28,7 +28,7 @@
  */
 static
 void rehash_move
-(map_entry * restrict dst, map_entry * restrict src,
+(map_entry * restrict dst, map_entry const * restrict src,
  size_t const dst_cap, size_t const src_cap,
  hash_func * const hasher)
 {

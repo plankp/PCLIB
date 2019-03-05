@@ -1,3 +1,19 @@
+/* 
+ * Copyright (c) 2019 Paul Teng
+ * 
+ * PCLIB is free software: you can redistribute it and/or modify  
+ * it under the terms of the GNU Lesser General Public License as   
+ * published by the Free Software Foundation, version 3.
+ *
+ * PCLIB is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * Lesser General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "binary_tree.h"
 
 #include <stdlib.h>
@@ -64,7 +80,7 @@ void bintree_clear
 }
 
 bool bintree_put
-(binary_tree * restrict const tree, void const * key, void const * value)
+(binary_tree * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* this is more like a multimap meaning you can have
    * multiple nodes with the same key (compare --> 0)
@@ -105,7 +121,7 @@ bool bintree_put
 }
 
 bool bintree_put_if_absent
-(binary_tree * restrict const tree, void const * key, void const * value)
+(binary_tree * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* this is more like a multimap meaning you can have
    * multiple nodes with the same key (compare --> 0)

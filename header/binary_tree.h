@@ -39,29 +39,144 @@ typedef struct binary_tree
   key_cmp * key_compare;
 } binary_tree;
 
-bool init_bintree     (binary_tree * const tree, key_cmp * key_compare, size_t data_size);
+/**
+ * Initializes a binary tree with the specified key comparator and value size.
+ * By changing the size of each value, this can be either act like a multiset
+ * or a multimap.
+ *
+ * @param tree - Pointer to an uninitialized binary tree
+ * @param key_compare - Key relational comparator
+ * @param data_size - Size of each value, 0 will cause multiset-like behaviour
+ *
+ * @return true if key_compare were not NULL
+ */
+bool init_bintree                     (binary_tree * const tree,
+                                       key_cmp * key_compare,
+                                       size_t data_size);
 
-void free_bintree     (binary_tree * const tree);
+/**
+ * Frees a binary tree, making it the same as uninitialized.
+ *
+ * @param tree - Pointer to initialized binary tree
+ */
+void free_bintree                     (binary_tree * const tree);
 
-void bintree_clear    (binary_tree * const tree);
+/**
+ * Clears a binary tree by deallocating all nodes and setting size to zero.
+ *
+ * @param tree - Pointer to initialized binary tree
+ */
+void bintree_clear                    (binary_tree * const tree);
 
-bool bintree_put      (binary_tree * restrict const tree, void const * key, void const * value);
+/**
+ * Puts a key with corresponding value into the tree.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param key - Key
+ * @param value - Value: ignored if tree was initialized with 0 value size
+ *
+ * @returns true if operation succeeded
+ */
+bool bintree_put                      (binary_tree * restrict const tree,
+                                       void const * restrict key,
+                                       void const * restrict value);
 
-bool bintree_put_if_absent    (binary_tree * restrict const tree, void const * key, void const * value);
+/**
+ * Puts a key with corresponding value into the tree only if key does not exist
+ * in the tree. If such key already exists, false is returned
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param key - Key
+ * @param value - Value: ignored if tree was initialized with 0 value size
+ *
+ * @returns true if operation succeeded, false if key already exists or
+ * memory could not be allocated
+ */
+bool bintree_put_if_absent            (binary_tree * restrict const tree,
+                                       void const * restrict key,
+                                       void const * restrict value);
 
-bool bintree_remove   (binary_tree * restrict const tree, void const * restrict key);
+/**
+ * Removes a key along with its values
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param pair - Key
+ *
+ * @return true if such a key was found and removed
+ */
+bool bintree_remove                   (binary_tree * restrict const tree,
+                                       void const * restrict key);
 
-bool bintree_has_key  (binary_tree const * restrict const tree, void const * restrict key);
+/**
+ * Checks if specified key exists
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param pair - Key
+ *
+ * @return true if such a key exists, false otherwise
+ */
+bool bintree_has_key                  (binary_tree const * restrict const tree,
+                                       void const * restrict key);
 
-size_t bintree_count_matches  (binary_tree const * restrict const tree, void const * restrict key);
+/**
+ * Checks the number of keys that match of the specified key
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param pair - Key
+ *
+ * @return the number of matching keys
+ */
+size_t bintree_count_matches          (binary_tree const * restrict const tree,
+                                       void const * restrict key);
 
-void const * bintree_get  (binary_tree const * restrict const tree, void const * restrict key, size_t * restrict matches);
+/**
+ * Returns the list of values corresponding to the specified key. If tree was
+ * initialized with value size of 0, there is no value, and so will always
+ * return NULL.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param pair - Key
+ * @param out_matches - Pointer that will be filled with the number of matches; ignored if NULL
+ *
+ * @return the list of values (as this is a multimap) or NULL
+ */
+void const * bintree_get              (binary_tree const * restrict const tree,
+                                       void const * restrict key,
+                                       size_t * restrict out_matches);
 
-void const * bintree_get_or_default (binary_tree const * restrict const tree, void const * key, void const * default_value);
+/**
+ * Returns the list of values corresponding to the specified key. If value
+ * does not exist because it has not been inserted yet or if tree was
+ * initialized with value size of 0, the default value will be returned.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param pair - Key
+ * @param default_value - Default value
+ *
+ * @return the list of values (as this is a multimap) or the default value
+ */
+void const * bintree_get_or_default   (binary_tree const * restrict const tree,
+                                       void const * key,
+                                       void const * default_value);
 
-void bintree_foreach  (binary_tree const * const tree,
-                       void (* it)(void const *, size_t, void const *));
+/**
+ * Iterates through every key-value entry of the tree. The state of the tree,
+ * should be kept consistent during the iteration process.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param it - An action to be performed on each entry
+ * (void const * key, size_t matches, void const * values)
+ */
+void bintree_foreach                  (binary_tree const * const tree,
+                                       void (* it)(void const *, size_t, void const *));
 
-size_t bintree_size   (binary_tree const * const tree);
+/**
+ * Returns the size of the binary tree
+ *
+ * @param tree - Pointer to initialized binary tree
+ *
+ * @return size of the binary tree
+ */
+size_t bintree_size                   (binary_tree const * const tree);
 
 #endif

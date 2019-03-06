@@ -245,7 +245,11 @@ void const * bintree_get
 {
   tree_node ** node = find_tree_node(tree, key);
 
-  if (*node == NULL) return NULL;
+  if (*node == NULL)
+  {
+    if (matches != NULL) *matches = 0;
+    return NULL;
+  }
 
   if (matches != NULL) *matches = (*node)->count;
   return tree->blk > 0 ? (*node)->values : NULL;

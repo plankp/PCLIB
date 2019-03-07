@@ -60,6 +60,16 @@ bool init_arrlist             (array_list * const list, size_t data_size);
 void free_arrlist             (array_list * const list);
 
 /**
+ * Duplicates the interal buffer with minimal capacity of length then frees
+ * the array list, making it the same as uninitialized.
+ *
+ * @param list - Pointer to initialized array list
+ *
+ * @return duplicated buffer, must be freed later
+ */
+void * cpy_free_arrlist       (array_list * const list);
+
+/**
  * Clears the array list by setting the size to zero. To release the
  * underlying storage slots, call arrlist_compact immediately after.
  *

@@ -47,6 +47,25 @@ void free_arrlist
   }
 }
 
+void * cpy_free_arrlist
+(array_list * const list)
+{
+  if (list->len == 0)
+  {
+    /* allocate a one byte long buffer */
+    void * ptr = calloc(1, sizeof(char));
+    free_arrlist(list);
+    return ptr;
+  }
+
+  /* return the internal buffer directly */
+  void * ptr = list->mem;
+  list->len = 0;
+  list->cap = 0;
+  list->mem = NULL;
+  return ptr;
+}
+
 void arrlist_clear
 (array_list * const list)
 {

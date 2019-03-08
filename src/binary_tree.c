@@ -23,7 +23,27 @@ static inline
 size_t calc_node_size
 (binary_tree const * const tree, size_t n)
 {
-  return sizeof(tree_node) + tree->blk * n;
+  return sizeof(tree_node) + tree->key_blk + tree->value_blk * n;
+}
+
+static
+tree_node *create_new_node
+(binary_tree const * restrict const tree, void const * restrict key, void const * restrict value)
+{
+  /* create a blank node */
+  tree_node *new_node = malloc(calc_node_size(tree, 1));
+  if (new_node == NULL) return NULL;
+
+  new_node->count = 1;
+  new_node->lhs = NULL;
+  new_node->rhs = NULL;
+
+  /* copy the key */
+  memcpy(&new_node->data[0], key, tree->key_blk);
+  /* copy the value */
+  memcpy(&new_node->data[tree->key_blk], value, tree->value_blk);
+
+  return new_node;
 }
 
 static
@@ -39,14 +59,14 @@ void free_subsequent_nodes
 
 static
 void traversal_inorder
-(tree_node const * node, bool const has_alloc_value, void (* it)(void const *, size_t, void const *))
+(binary_tree const * restrict const tree, tree_node const * node, void (* it)(void const *, size_t, void const *))
 {
   if (node == NULL) return;
 
   /* visit lhs, data then rhs */
-  traversal_inorder(node->lhs, has_alloc_value, it);
-  it(node->key, node->count, has_alloc_value ? node->values : NULL);
-  traversal_inorder(node->rhs, has_alloc_value, it);
+  traversal_inorder(tree, node->lhs, it);
+  it(&node->data[0], node->count, tree->value_blk > 0 ? &node->data[tree->key_blk] : NULL);
+  traversal_inorder(tree, node->rhs, it);
 }
 
 static
@@ -59,7 +79,7 @@ tree_node ** find_tree_node
   tree_node * const * node = &tree->root;
   while (*node != NULL)
   {
-    int const cmp = tree->key_compare((*node)->key, key);
+    int const cmp = tree->key_compare((*node)->data, key);
     if (cmp > 0) node = &((*node)->rhs);
     else if (cmp < 0) node = &((*node)->lhs);
     else /* cmp == 0 */
@@ -71,12 +91,13 @@ tree_node ** find_tree_node
 }
 
 bool init_bintree
-(binary_tree * const tree, key_cmp * key_compare, size_t data_size)
+(binary_tree * const tree, key_cmp * key_compare, size_t key_size, size_t value_size)
 {
-  if (key_compare == NULL) return false;
+  if (key_compare == NULL || key_size == 0) return false;
 
   tree->len = 0;
-  tree->blk = data_size;
+  tree->key_blk = key_size;
+  tree->value_blk = value_size;
   tree->root = NULL;
   tree->key_compare = key_compare;
   return true;
@@ -106,15 +127,8 @@ bool bintree_put
   tree_node ** node = find_tree_node(tree, key);
   if (*node == NULL)
   {
-    /* create a blank node */
-    tree_node *new_node = malloc(calc_node_size(tree, 1));
-    if (new_node == NULL) return NULL;
-
-    new_node->count = 1;
-    new_node->key = key;
-    new_node->lhs = NULL;
-    new_node->rhs = NULL;
-    memcpy(new_node->values, value, tree->blk);
+    tree_node *new_node = create_new_node(tree, key, value);
+    if (new_node == NULL) return false;
 
     ++tree->len;
     *node = new_node;
@@ -123,11 +137,11 @@ bool bintree_put
 
   /* resize the current node */
   tree_node * current = *node;
-  tree_node * resized = tree->blk == 0 ? current : realloc(current, calc_node_size(tree, current->count + 1));
+  tree_node * resized = tree->value_blk == 0 ? current : realloc(current, calc_node_size(tree, current->count + 1));
   if (resized == NULL) return false;
 
   ++tree->len;
-  memcpy(resized->values + tree->blk * resized->count++, value, tree->blk);
+  memcpy(&resized->data[tree->key_blk + tree->value_blk * resized->count++], value, tree->value_blk);
   *node = resized;
   return true;
 }
@@ -140,14 +154,9 @@ bool bintree_put_if_absent
   if (*node != NULL) return false;
 
   /* *node == NULL, which means creating a blank node */
-  tree_node *new_node = malloc(calc_node_size(tree, 1));
-  if (new_node == NULL) return NULL;
 
-  new_node->count = 1;
-  new_node->key = key;
-  new_node->lhs = NULL;
-  new_node->rhs = NULL;
-  memcpy(new_node->values, value, tree->blk);
+  tree_node *new_node = create_new_node(tree, key, value);
+  if (new_node == NULL) return false;
 
   ++tree->len;
   *node = new_node;
@@ -252,7 +261,7 @@ void const * bintree_get
   }
 
   if (matches != NULL) *matches = (*node)->count;
-  return tree->blk > 0 ? (*node)->values : NULL;
+  return tree->value_blk > 0 ? &(*node)->data[tree->key_blk] : NULL;
 }
 
 void const * bintree_get_or_default
@@ -265,7 +274,7 @@ void const * bintree_get_or_default
 void bintree_foreach
 (binary_tree const * const tree, void (* it)(void const *, size_t, void const *))
 {
-  traversal_inorder(tree->root, tree->blk > 0, it);
+  traversal_inorder(tree, tree->root, it);
 }
 
 size_t bintree_size

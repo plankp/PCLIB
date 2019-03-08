@@ -25,16 +25,16 @@ typedef int (key_cmp)(void const *, void const *);
 typedef struct tree_node
 {
   size_t count;
-  void const * key;
   struct tree_node * lhs; /* less than */
   struct tree_node * rhs; /* more than */
-  char values[];
+  char data[];
 } tree_node;
 
 typedef struct binary_tree
 {
   size_t len;
-  size_t blk;
+  size_t key_blk;
+  size_t value_blk;
   tree_node * root;
   key_cmp * key_compare;
 } binary_tree;
@@ -46,13 +46,15 @@ typedef struct binary_tree
  *
  * @param tree - Pointer to an uninitialized binary tree
  * @param key_compare - Key relational comparator
- * @param data_size - Size of each value, 0 will cause multiset-like behaviour
+ * @param key_size - Size of each key
+ * @param value_size - Size of each value, 0 will cause multiset-like behaviour
  *
- * @return true if key_compare were not NULL
+ * @return true if key_compare or key_size were not NULL
  */
 bool init_bintree                     (binary_tree * const tree,
                                        key_cmp * key_compare,
-                                       size_t data_size);
+                                       size_t key_size,
+                                       size_t value_size);
 
 /**
  * Frees a binary tree, making it the same as uninitialized.

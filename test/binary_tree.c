@@ -7,22 +7,23 @@ static
 int string_cmp
 (void const * a, void const * b)
 {
-  char const * strA = a;
-  char const * strB = b;
+  char const * const * strA = a;
+  char const * const * strB = b;
 
-  return strcmp(strA, strB);
+  return strcmp(*strA, *strB);
 }
 
 static
 void default_walker
-(void const * key, size_t matches, void const * values)
+(void const * key_slot, size_t matches, void const * values)
 {
   /* inserting (char const *, int):
    * - key: char const *
    * - value: int const *
    */
+  char const * const * key = key_slot;
   int const *ints = values;
-  printf("%s(%zu): ", (char const *) key, matches);
+  printf("%s(%zu): ", *key, matches);
   for (size_t i = 0; i < matches; ++i)
   {
     printf("%d ", ints[i]);
@@ -34,7 +35,7 @@ int main
 (int argc, char **argv)
 {
   binary_tree tree;
-  init_bintree(&tree, &string_cmp, sizeof(int));
+  init_bintree(&tree, &string_cmp, sizeof(char const *), sizeof(int));
 
   static char const * const test_data[] =
   {
@@ -57,35 +58,45 @@ int main
 
   for (size_t i = 0; i < sizeof(test_data) / sizeof(char const *); ++i)
   {
-    bintree_put(&tree, test_data[i], &i);
+    bintree_put(&tree, &test_data[i], &i);
   }
 
   int tmp = 100;
-  bintree_put_if_absent(&tree, "Beta", &tmp);
+  char const * str = "Beta";
+  bintree_put_if_absent(&tree, &str, &tmp);
 
   tmp = 101;
-  bintree_put_if_absent(&tree, "Beta", &tmp);
+  bintree_put_if_absent(&tree, &str, &tmp);
 
   bintree_foreach(&tree, &default_walker);
   printf("Tree size: %zu\n\n", bintree_size(&tree));
 
-  printf("Tree has 'Gamma'?: %d\n", bintree_has_key(&tree, "Gamma"));
-  printf("Tree has %zu 'Alpha's\n", bintree_count_matches(&tree, "Alpha"));
-  printf("Tree has %zu 'Foo's\n\n", bintree_count_matches(&tree, "Foo"));
+  str = "Gamma";
+  printf("Tree has 'Gamma'?: %d\n", bintree_has_key(&tree, &str));
 
-  bintree_remove(&tree, "Alpha");
+  str = "Alpha";
+  printf("Tree has %zu 'Alpha's\n", bintree_count_matches(&tree, &str));
+
+  str = "Foo";
+  printf("Tree has %zu 'Foo's\n\n", bintree_count_matches(&tree, &str));
+
+  str = "Alpha";
+  bintree_remove(&tree, &str);
   bintree_foreach(&tree, &default_walker);
   printf("Tree size: %zu\n\n", bintree_size(&tree));
 
-  bintree_remove(&tree, "PzrhlPLqET");
+  str = "PzrhlPLqET";
+  bintree_remove(&tree, &str);
   bintree_foreach(&tree, &default_walker);
   printf("Tree size: %zu\n\n", bintree_size(&tree));
 
-  bintree_remove(&tree, "rYxhygHpTi");
+  str = "rYxhygHpTi";
+  bintree_remove(&tree, &str);
   bintree_foreach(&tree, &default_walker);
   printf("Tree size: %zu\n\n", bintree_size(&tree));
 
-  printf("Beta --> %d\n", *(int const *) bintree_get(&tree, "Beta", NULL));
+  str = "Beta";
+  printf("Beta --> %d\n", *(int const *) bintree_get(&tree, &str, NULL));
 
   free_bintree(&tree);
   return 0;

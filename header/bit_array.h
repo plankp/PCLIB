@@ -23,10 +23,10 @@
 #include <string.h>
 #include <stdbool.h>
 
-typedef struct bitarray_t
+typedef struct bit_array
 {
 	size_t c; uint32_t *b;
-} bitarray_t;
+} bit_array;
 
 #ifdef __cplusplus
 extern "C"
@@ -43,14 +43,14 @@ extern "C"
  * @param bits The number of bits for the bit array
  * @returns The newly created bit array
  */
-bitarray_t init_bitarray (size_t bits);
+bit_array init_bitarr (size_t bits);
 
 /**
  * Destructs the bit array by freeing the underlying bit storage.
  *
  * @param arr The bit array being cleaned up
  */
-void clean_bitarray (bitarray_t *arr);
+void free_bitarr (bit_array *arr);
 
 /**
  * Clears a bit array by unsetting all bits making the underlying
@@ -58,7 +58,7 @@ void clean_bitarray (bitarray_t *arr);
  *
  * @param arr The bit array being falsed
  */
-void bitarray_clear (bitarray_t *arr);
+void bitarr_clear (bit_array *arr);
 
 /**
  * Toggles a specific bit of a bit array. If the bit was previously
@@ -68,7 +68,7 @@ void bitarray_clear (bitarray_t *arr);
  * @param arr The bit array being toggled
  * @param bit The specified bit to be toggled
  */
-void bitarray_toggle (bitarray_t *arr, size_t bit);
+void bitarr_toggle (bit_array *arr, size_t bit);
 
 /**
  * Unsets a specific bit of a bit array. In other words, turing a
@@ -78,7 +78,7 @@ void bitarray_toggle (bitarray_t *arr, size_t bit);
  * @param arr The bit array being unsetted
  * @param bit The specified bit to be unsetted
  */
-void bitarray_unset (bitarray_t *arr, size_t bit);
+void bitarr_unset (bit_array *arr, size_t bit);
 
 /**
  * Sets a specific bit of a bit array. In other words, turing a bit
@@ -88,7 +88,7 @@ void bitarray_unset (bitarray_t *arr, size_t bit);
  * @param arr The bit array being setted
  * @param bit The specified bit to be setted
  */
-void bitarray_set (bitarray_t *arr, size_t bit);
+void bitarr_set (bit_array *arr, size_t bit);
 
 /**
  * Retrieves the toggle status of a specific bit in a bit array.
@@ -98,7 +98,7 @@ void bitarray_set (bitarray_t *arr, size_t bit);
  *
  * @returns 1 if bit is true, 0 if bit is false
  */
-int bitarray_get (bitarray_t *arr, size_t bit);
+int bitarr_get (bit_array *arr, size_t bit);
 
 /**
  * Returns the size of the bit array. This value does not mean the
@@ -108,7 +108,7 @@ int bitarray_get (bitarray_t *arr, size_t bit);
  *
  * @returns The number of bits of a bit array
  */
-size_t bitarray_size (bitarray_t *arr);
+size_t bitarr_size (bit_array *arr);
 
 /**
  * Iterates through a bit array. All bits are iterated as opposed
@@ -118,7 +118,7 @@ size_t bitarray_size (bitarray_t *arr);
  * @param vis The callback function, takes a bit (bool) as
  *            parameter, returns loop_state_t
  */
-void bitarray_for_each (bitarray_t *arr, void (*vis)(bool));
+void bitarr_for_each (bit_array *arr, void (*vis)(bool));
 
 /**
  * Performs a bitwise and between two arrays and returns a new
@@ -130,7 +130,7 @@ void bitarray_for_each (bitarray_t *arr, void (*vis)(bool));
  *
  * @returns A bit array with the results
  */
-bitarray_t bitarray_and (bitarray_t *lhs, bitarray_t *rhs);
+bit_array bitarr_and (bit_array *lhs, bit_array *rhs);
 
 /**
  * Performs a bitwise or between two arrays and returns a new
@@ -142,7 +142,7 @@ bitarray_t bitarray_and (bitarray_t *lhs, bitarray_t *rhs);
  *
  * @returns A bit array with the results
  */
-bitarray_t bitarray_or (bitarray_t *lhs, bitarray_t *rhs);
+bit_array bitarr_or (bit_array *lhs, bit_array *rhs);
 
 /**
  * Performs a bitwise xor between two arrays and returns a new
@@ -155,7 +155,7 @@ bitarray_t bitarray_or (bitarray_t *lhs, bitarray_t *rhs);
  * @returns A bit array with the results
  */
 
-bitarray_t bitarray_xor (bitarray_t *lhs, bitarray_t *rhs);
+bit_array bitarr_xor (bit_array *lhs, bit_array *rhs);
 
 /**
  * Performs a bitwise not of an array and returns a new bit
@@ -166,7 +166,7 @@ bitarray_t bitarray_xor (bitarray_t *lhs, bitarray_t *rhs);
  *
  * @returns A bit array with the opposite toggled bits of base
  */
-bitarray_t bitarray_not (bitarray_t *base);
+bit_array bitarr_not (bit_array *base);
 
 #ifdef __cplusplus
 }

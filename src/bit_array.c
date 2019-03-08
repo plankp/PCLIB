@@ -94,13 +94,13 @@ bitarray_size(bitarray_t *arr)
 }
 
 void
-bitarray_for_each(bitarray_t *arr, loop_state_t (*vis)(int))
+bitarray_for_each(bitarray_t *arr, void (*vis)(bool))
 {
 	if (arr->c == 0 || arr->b == NULL) return;
 	size_t i;
 	for (i = 0; i < arr->c; ++i)
 	{
-		if (vis(bitarray_get(arr, i)) != CONTINUE) break;
+		vis(bitarray_get(arr, i));
 	}
 }
 

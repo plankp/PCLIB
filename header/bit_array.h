@@ -17,12 +17,11 @@
 #ifndef __BIT_ARRAY_H__
 #define __BIT_ARRAY_H__
 
-#include "utils.h"
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct bitarray_t
 {
@@ -116,10 +115,10 @@ size_t bitarray_size (bitarray_t *arr);
  * only the true bits are being iterated.
  *
  * @param arr The bit array being iterated
- * @param vis The callback function, takes a bit (int) as
+ * @param vis The callback function, takes a bit (bool) as
  *            parameter, returns loop_state_t
  */
-void bitarray_for_each (bitarray_t *arr, loop_state_t (*vis)(int));
+void bitarray_for_each (bitarray_t *arr, void (*vis)(bool));
 
 /**
  * Performs a bitwise and between two arrays and returns a new

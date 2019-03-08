@@ -29,11 +29,6 @@ typedef struct bit_array
   uint32_t *b;
 } bit_array;
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /**
  * Initializes a fixed bit array with the specified amount of bits. The
  * underlying structure is implemented using 32 bit integers meaning
@@ -168,9 +163,5 @@ bit_array bitarr_xor (bit_array *lhs, bit_array *rhs);
  * @returns A bit array with the opposite toggled bits of base
  */
 bit_array bitarr_not (bit_array *base);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -86,7 +86,7 @@ bitarr_set(bit_array *arr, size_t bit)
 bool
 bitarr_get(bit_array const *arr, size_t bit)
 {
-  if (bit >= arr->c || arr->b == NULL) return 0;
+  if (bit >= arr->c || arr->b == NULL) return false;
   return arr->b[bit / WORDSZ] >> (bit % WORDSZ);
 }
 

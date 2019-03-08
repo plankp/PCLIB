@@ -43,6 +43,15 @@ init_bitarr(bit_array *arr, size_t bits)
   return true;
 }
 
+bool init_cpy_bitarr
+(bit_array *arr, bit_array const *original)
+{
+  if (original == NULL) return false;
+  if (!init_bitarr(arr, original->c)) return false;
+  bitarr_or(arr, original);
+  return true;
+}
+
 void
 free_bitarr(bit_array *arr)
 {

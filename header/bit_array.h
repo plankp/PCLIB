@@ -40,6 +40,17 @@ typedef struct bit_array
 bool init_bitarr (bit_array *arr, size_t bits);
 
 /**
+ * Initializes a bit array with the size and same set bits as another bit
+ * array
+ *
+ * @param arr - Pointer to an uninitialized bit array
+ * @param original - The bit array being duplicated
+ *
+ * @return true if bit array was successfully initialized
+ */
+bool init_cpy_bitarr (bit_array *arr, bit_array const *original);
+
+/**
  * Destructs the bit array by freeing the underlying bit storage.
  *
  * @param arr The bit array being cleaned up

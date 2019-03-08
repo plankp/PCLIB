@@ -25,7 +25,8 @@
 
 typedef struct bit_array
 {
-	size_t c; uint32_t *b;
+  size_t c;
+  uint32_t *b;
 } bit_array;
 
 #ifdef __cplusplus

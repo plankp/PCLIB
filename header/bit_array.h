@@ -17,8 +17,7 @@
 #ifndef __BIT_ARRAY_H__
 #define __BIT_ARRAY_H__
 
-#include <stddef.h>
-#include <stdint.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>

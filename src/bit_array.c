@@ -16,13 +16,14 @@
 
 #include "bit_array.h"
 
-#define WORDSZ  (sizeof(unsigned int))
+#define WORDSZ    (sizeof(unsigned int))
+#define WORDBITS  (WORDSZ * CHAR_BIT)
 
 static inline
 size_t
 compute_word_len(size_t bits)
 {
-  return ((bits + WORDSZ - 1) / WORDSZ) * WORDSZ;
+  return ((bits + WORDBITS - 1) / WORDBITS);
 }
 
 bool
@@ -124,28 +125,28 @@ void
 bitarr_toggle(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / WORDSZ] ^= 1 << (bit % WORDSZ);
+  arr->b[bit / WORDBITS] ^= 1 << (bit % WORDBITS);
 }
 
 void
 bitarr_unset(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / WORDSZ] &= ~(1 << (bit % WORDSZ));
+  arr->b[bit / WORDBITS] &= ~(1 << (bit % WORDBITS));
 }
 
 void
 bitarr_set(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / WORDSZ] |= 1 << (bit % WORDSZ);
+  arr->b[bit / WORDBITS] |= 1 << (bit % WORDBITS);
 }
 
 bool
 bitarr_get(bit_array const *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return false;
-  return arr->b[bit / WORDSZ] >> (bit % WORDSZ);
+  return (arr->b[bit / WORDBITS] >> (bit % WORDBITS)) & 1;
 }
 
 size_t
@@ -210,5 +211,17 @@ void bitarr_not
   for (size_t i = 0; i < wordlen; ++i)
   {
     base->b[i] = ~base->b[i];
+  }
+
+  /* need to account for boundary size difference:
+   * (say WORDBITS is 8)        7 6 5 4 3 2 1 0
+   * bit_array a with cap = 3: [0 0 0 0 0 0 0 0]
+   * not a                   : [1 1 1 1 1 1 1 1]
+   * need to correct bits [4, 7] since they are out of capacity:
+   * correction mask         : [0 0 0 0 1 1 1 1]
+   */
+  if (wordlen > 0)
+  {
+    base->b[wordlen - 1] &= UINT_MAX >> (wordlen * WORDBITS - base->c);
   }
 }

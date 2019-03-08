@@ -26,20 +26,18 @@
 typedef struct bit_array
 {
   size_t c;
-  uint32_t *b;
+  unsigned int *b;
 } bit_array;
 
 /**
- * Initializes a fixed bit array with the specified amount of bits. The
- * underlying structure is implemented using 32 bit integers meaning
- * that the smallest amount of bits allocated is 32. This, however, does
- * not mean you can use all of the 32 bits if the amount of bits is less
- * than 32.
+ * Initializes a fixed bit array with the specified amount of bits.
  *
+ * @param arr - Pointer to an uninitialized bit array
  * @param bits The number of bits for the bit array
- * @returns The newly created bit array
+ *
+ * @returns true if bit array was successfully initialized
  */
-bit_array init_bitarr (size_t bits);
+bool init_bitarr (bit_array *arr, size_t bits);
 
 /**
  * Destructs the bit array by freeing the underlying bit storage.
@@ -92,13 +90,12 @@ void bitarr_set (bit_array *arr, size_t bit);
  * @param arr The bit array being queried
  * @param bit The specified bit to be queried
  *
- * @returns 1 if bit is true, 0 if bit is false
+ * @returns true if bit is set, false if bit is unset
  */
-int bitarr_get (bit_array *arr, size_t bit);
+bool bitarr_get (bit_array *arr, size_t bit);
 
 /**
- * Returns the size of the bit array. This value does not mean the
- * amount of 32 bit integers used but the number of bits.
+ * Returns the number of bits of the bit array.
  *
  * @param arr The bit array being queried
  *
@@ -117,51 +114,42 @@ size_t bitarr_size (bit_array *arr);
 void bitarr_for_each (bit_array *arr, void (*vis)(bool));
 
 /**
- * Performs a bitwise and between two arrays and returns a new
- * bit array with the resulting bits. The two arrays are not
- * modified.
+ * Performs a bitwise and between two arrays. Only the lhs is modified.
  *
- * @param lhs Bit array 1
+ * If rhs has a smaller size than lhs, the result is as if rhs was padded with
+ * false (0) bits until the dimensions match.
+ *
+ * @param lhs Bit array 1, will contain the result after
  * @param rhs Bit array 2
  *
  * @returns A bit array with the results
  */
-bit_array bitarr_and (bit_array *lhs, bit_array *rhs);
+void bitarr_and (bit_array *lhs, bit_array const *rhs);
 
 /**
- * Performs a bitwise or between two arrays and returns a new
- * bit array with the resulting bits. The two arrays are not
- * modified.
+ * Performs a bitwise or between two arrays. Only the lhs is modified
  *
- * @param lhs Bit array 1
+ * @param lhs Bit array 1, will contain the result after
  * @param rhs Bit array 2
  *
  * @returns A bit array with the results
  */
-bit_array bitarr_or (bit_array *lhs, bit_array *rhs);
+void bitarr_or (bit_array *lhs, bit_array const *rhs);
 
 /**
- * Performs a bitwise xor between two arrays and returns a new
- * bit array with the resulting bits. The two arrays are not
- * modified.
+ * Performs a bitwise xor between two arrays. Only the lhs is modified
  *
- * @param lhs Bit array 1
+ * @param lhs Bit array 1, will contain the result after
  * @param rhs Bit array 2
- *
- * @returns A bit array with the results
  */
 
-bit_array bitarr_xor (bit_array *lhs, bit_array *rhs);
+void bitarr_xor (bit_array *lhs, bit_array const *rhs);
 
 /**
- * Performs a bitwise not of an array and returns a new bit
- * array with the resulting bits. The original array is not
- * modified.
+ * Performs a bitwise not of an array. The original array is modified.
  *
- * @param base Bit array
- *
- * @returns A bit array with the opposite toggled bits of base
+ * @param base Bit array, will contain the result after
  */
-bit_array bitarr_not (bit_array *base);
+void bitarr_not (bit_array *base);
 
 #endif

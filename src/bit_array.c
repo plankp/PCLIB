@@ -16,28 +16,31 @@
 
 #include "bit_array.h"
 
+#define WORDSZ  (sizeof(unsigned int))
+
 static inline
 size_t
 compute_word_len(size_t bits)
 {
-  return ((bits + 31) / 32) * 32;
+  return ((bits + WORDSZ - 1) / WORDSZ) * WORDSZ;
 }
 
-bit_array
-init_bitarr(size_t bits)
+bool
+init_bitarr(bit_array *arr, size_t bits)
 {
-  // Using uint32_t, type guaranteed to be 32 bits!
   if (bits == 0)
   {
-    return (bit_array) {
-      .c=0, .b=NULL
-    };
+    arr->c = 0;
+    arr->b = NULL;
+    return true;
   }
 
   const size_t cap = compute_word_len(bits);
-  return (bit_array) {
-    .c=bits, .b=calloc(cap, sizeof (uint32_t))
-  };
+  unsigned int * buf = calloc(cap, sizeof (unsigned int));
+  if (buf == NULL) return false;
+  arr->c = bits;
+  arr->b = buf;
+  return true;
 }
 
 void
@@ -55,7 +58,7 @@ void
 bitarr_clear(bit_array *arr)
 {
   if (arr->c == 0 || arr->b == NULL) return;
-  size_t cap = arr->c / 32 + (arr->c % 32 == 0 ? 0 : 1);
+  size_t cap = compute_word_len(arr->c);
   while (cap-- > 0) arr->b[cap] = 0;
 }
 
@@ -63,28 +66,28 @@ void
 bitarr_toggle(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / 32] ^= 1 << (bit % 32);
+  arr->b[bit / WORDSZ] ^= 1 << (bit % WORDSZ);
 }
 
 void
 bitarr_unset(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / 32] &= ~(1 << (bit % 32));
+  arr->b[bit / WORDSZ] &= ~(1 << (bit % WORDSZ));
 }
 
 void
 bitarr_set(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return;
-  arr->b[bit / 32] |= 1 << (bit % 32);
+  arr->b[bit / WORDSZ] |= 1 << (bit % WORDSZ);
 }
 
-int
+bool
 bitarr_get(bit_array *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return 0;
-  return (arr->b[bit / 32] >> (bit % 32)) & 1;
+  return arr->b[bit / WORDSZ] >> (bit % WORDSZ);
 }
 
 size_t
@@ -104,75 +107,50 @@ bitarr_for_each(bit_array *arr, void (*vis)(bool))
   }
 }
 
-bit_array
-bitarr_and(bit_array *lhs, bit_array *rhs)
+void
+bitarr_and(bit_array *lhs, bit_array const *rhs)
 {
-  const size_t new_size = lhs->c > rhs->c ? lhs->c : rhs->c;
-  bit_array arr = init_bitarr(new_size);
-  const size_t minwordlen = compute_word_len(
-      lhs->c < rhs->c ? lhs->c : rhs->c);
+  size_t const lhs_len = compute_word_len(lhs->c);
+  size_t const rhs_len = compute_word_len(rhs->c);
+  size_t const minwordlen = lhs_len > rhs_len ? rhs_len : lhs_len;
+  for (size_t i = 0; i < minwordlen; ++i)
+  {
+    lhs->b[i] &= rhs->b[i];
+  }
 
-  size_t i;
-  for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] & rhs->b[i];
-
-  // The remaining bits will guaranteed to be false since both
-  // true is required to become true
-
-  return arr;
+  /* set the remaining bits to false */
+  for (size_t i = minwordlen; i < lhs_len; ++i)
+  {
+    lhs->b[i] = 0;
+  }
 }
 
-bit_array
-bitarr_or(bit_array *lhs, bit_array *rhs)
+void
+bitarr_or(bit_array *lhs, bit_array const *rhs)
 {
-  bit_array arr;
-  size_t i, minwordlen;
-  if (lhs->c > rhs->c)
+  size_t const minwordlen = compute_word_len(lhs->c > rhs->c ? rhs->c : lhs->c);
+  for (size_t i = 0; i < minwordlen; ++i)
   {
-    arr = init_bitarr(lhs->c);
-    minwordlen = compute_word_len(rhs->c);
-    memmove(arr.b + minwordlen, lhs->b + minwordlen,
-        (compute_word_len(lhs->c) - minwordlen) * sizeof (uint32_t));
+    lhs->b[i] |= rhs->b[i];
   }
-  else
-  {
-    arr = init_bitarr(rhs->c);
-    minwordlen = compute_word_len(lhs->c);
-    memmove(arr.b + minwordlen, lhs->b + minwordlen,
-        (compute_word_len(rhs->c) - minwordlen) * sizeof (uint32_t));
-  }
-  for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] | rhs->b[i];
-  return arr;
 }
 
-bit_array
-bitarr_xor(bit_array *lhs, bit_array *rhs)
+void
+bitarr_xor(bit_array *lhs, bit_array const *rhs)
 {
-  bit_array arr;
-  size_t i, minwordlen;
-  if (lhs->c > rhs->c)
+  size_t const minwordlen = compute_word_len(lhs->c > rhs->c ? rhs->c : lhs->c);
+  for (size_t i = 0; i < minwordlen; ++i)
   {
-    arr = init_bitarr(lhs->c);
-    minwordlen = compute_word_len(rhs->c);
-    memmove(arr.b + minwordlen, lhs->b + minwordlen,
-        (compute_word_len(lhs->c) - minwordlen) * sizeof (uint32_t));
+    lhs->b[i] ^= rhs->b[i];
   }
-  else
-  {
-    arr = init_bitarr(rhs->c);
-    minwordlen = compute_word_len(lhs->c);
-    memmove(arr.b + minwordlen, lhs->b + minwordlen,
-        (compute_word_len(rhs->c) - minwordlen) * sizeof (uint32_t));
-  }
-  for (i = 0; i < minwordlen; ++i) arr.b[i] = lhs->b[i] ^ rhs->b[i];
-  return arr;
-
 }
 
-bit_array
-bitarr_not(bit_array *base)
+void bitarr_not
+(bit_array *base)
 {
-  bit_array arr = init_bitarr(base->c);
-  size_t i, wordlen = compute_word_len(base->c);
-  for (i = 0; i < wordlen; ++i) arr.b[i] = ~base->b[i];
-  return arr;
+  size_t const wordlen = compute_word_len(base->c);
+  for (size_t i = 0; i < wordlen; ++i)
+  {
+    base->b[i] = ~base->b[i];
+  }
 }

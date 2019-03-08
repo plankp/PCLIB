@@ -55,6 +55,25 @@ void free_bitarr (bit_array *arr);
 void bitarr_clear (bit_array *arr);
 
 /**
+ * Attempts to release unused underlying storage slots.
+ *
+ * @param arr - The bit array being compacted
+ */
+void bitarr_compact (bit_array *arr);
+
+/**
+ * Resizes the bit array to only accomodate the fixed amount of bits.
+ * Shrinking a bit array will only change the logical size. To shrink the
+ * underlying buffer, call bitarr_compact immediately after.
+ *
+ * @param arr - The bit array being resized
+ * @param new_bits - The new number of bits being accomdated
+ *
+ * @return true if resize operation was successful
+ */
+bool bitarr_resize (bit_array *arr, size_t new_bits);
+
+/**
  * Toggles a specific bit of a bit array. If the bit was previously
  * false (0), it becomes true (1) and vice-versa. Nothing happens if
  * the specified bit is out of range.

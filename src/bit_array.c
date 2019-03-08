@@ -36,7 +36,7 @@ init_bitarr(bit_array *arr, size_t bits)
   }
 
   const size_t cap = compute_word_len(bits);
-  unsigned int * buf = calloc(cap, sizeof (unsigned int));
+  unsigned int * buf = calloc(cap, WORDSZ);
   if (buf == NULL) return false;
   arr->c = bits;
   arr->b = buf;
@@ -52,6 +52,55 @@ free_bitarr(bit_array *arr)
     free(arr->b);
     arr->b = NULL;
   }
+}
+
+void bitarr_compact
+(bit_array *arr)
+{
+  size_t const len = compute_word_len(arr->c);
+  unsigned int * new_buf = realloc(arr->b, len * WORDSZ);
+  if (new_buf != NULL)
+  {
+    arr->b = new_buf;
+  }
+
+  /* if realloc failed (== NULL), continue:
+   * standard says original memory is unchanged
+   */
+}
+
+bool bitarr_resize
+(bit_array *arr, size_t new_bits)
+{
+  /* case where array already accomodates those bits */
+  if (arr->c == new_bits) return true;
+
+  size_t const new_len = compute_word_len(new_bits);
+  size_t const old_len = compute_word_len(arr->c);
+  if (arr->c > new_bits)
+  {
+    /* shrink operation: do not resize underlying buffer,
+     * just clear out the bits
+     */
+    arr->c = new_bits;
+    for (size_t i = new_len; i < old_len; ++i)
+    {
+      arr->b[i] = 0;
+    }
+    return true;
+  }
+
+  /* grow the underlying buffer */
+  unsigned int * new_buf = realloc(arr->b, new_len * WORDSZ);
+  if (new_buf == NULL) return false;
+
+  arr->c = new_bits;
+  arr->b = new_buf;
+  for (size_t i = old_len; i < new_len; ++i)
+  {
+    arr->b[i] = 0;
+  }
+  return true;
 }
 
 void

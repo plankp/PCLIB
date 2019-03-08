@@ -84,20 +84,20 @@ bitarr_set(bit_array *arr, size_t bit)
 }
 
 bool
-bitarr_get(bit_array *arr, size_t bit)
+bitarr_get(bit_array const *arr, size_t bit)
 {
   if (bit >= arr->c || arr->b == NULL) return 0;
   return arr->b[bit / WORDSZ] >> (bit % WORDSZ);
 }
 
 size_t
-bitarr_size(bit_array *arr)
+bitarr_size(bit_array const *arr)
 {
   return arr->c;
 }
 
 void
-bitarr_for_each(bit_array *arr, void (*vis)(bool))
+bitarr_for_each(bit_array const *arr, void (*vis)(bool))
 {
   if (arr->c == 0 || arr->b == NULL) return;
   size_t i;

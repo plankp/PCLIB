@@ -92,7 +92,7 @@ void bitarr_set (bit_array *arr, size_t bit);
  *
  * @returns true if bit is set, false if bit is unset
  */
-bool bitarr_get (bit_array *arr, size_t bit);
+bool bitarr_get (bit_array const *arr, size_t bit);
 
 /**
  * Returns the number of bits of the bit array.
@@ -101,7 +101,7 @@ bool bitarr_get (bit_array *arr, size_t bit);
  *
  * @returns The number of bits of a bit array
  */
-size_t bitarr_size (bit_array *arr);
+size_t bitarr_size (bit_array const *arr);
 
 /**
  * Iterates through a bit array. All bits are iterated as opposed
@@ -111,7 +111,7 @@ size_t bitarr_size (bit_array *arr);
  * @param vis The callback function, takes a bit (bool) as
  *            parameter, returns loop_state_t
  */
-void bitarr_for_each (bit_array *arr, void (*vis)(bool));
+void bitarr_for_each (bit_array const *arr, void (*vis)(bool));
 
 /**
  * Performs a bitwise and between two arrays. Only the lhs is modified.

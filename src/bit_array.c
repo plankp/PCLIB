@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2016 Paul Teng
+ * Copyright (c) 2019 Paul Teng
  * 
  * PCLIB is free software: you can redistribute it and/or modify  
  * it under the terms of the GNU Lesser General Public License as   
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bitarray.h"
+#include "bit_array.h"
 
 static inline
 size_t

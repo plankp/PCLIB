@@ -155,7 +155,7 @@ bitarr_size(bit_array const *arr)
 }
 
 void
-bitarr_for_each(bit_array const *arr, void (*vis)(bool))
+bitarr_foreach(bit_array const *arr, void (*vis)(bool))
 {
   if (arr->c == 0 || arr->b == NULL) return;
   size_t i;

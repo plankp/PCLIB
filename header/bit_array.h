@@ -141,7 +141,7 @@ size_t bitarr_size (bit_array const *arr);
  * @param vis The callback function, takes a bit (bool) as
  *            parameter, returns loop_state_t
  */
-void bitarr_for_each (bit_array const *arr, void (*vis)(bool));
+void bitarr_foreach (bit_array const *arr, void (*vis)(bool));
 
 /**
  * Performs a bitwise and between two arrays. Only the lhs is modified.

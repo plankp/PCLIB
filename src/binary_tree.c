@@ -20,10 +20,17 @@
 #include <string.h>
 
 static inline
+size_t calc_value_offset
+(binary_tree const * const tree, size_t n)
+{
+  return tree->key_blk + tree->value_blk * n;
+}
+
+static inline
 size_t calc_node_size
 (binary_tree const * const tree, size_t n)
 {
-  return sizeof(tree_node) + tree->key_blk + tree->value_blk * n;
+  return sizeof(tree_node) + calc_value_offset(tree, n);
 }
 
 static
@@ -39,9 +46,9 @@ tree_node *create_new_node
   new_node->rhs = NULL;
 
   /* copy the key */
-  memcpy(&new_node->data[0], key, tree->key_blk);
+  memcpy(new_node->data, key, tree->key_blk);
   /* copy the value */
-  memcpy(&new_node->data[tree->key_blk], value, tree->value_blk);
+  memcpy(new_node->data + calc_value_offset(tree, 0), value, tree->value_blk);
 
   return new_node;
 }
@@ -65,7 +72,7 @@ void traversal_inorder
 
   /* visit lhs, data then rhs */
   traversal_inorder(tree, node->lhs, it);
-  it(&node->data[0], node->count, tree->value_blk > 0 ? &node->data[tree->key_blk] : NULL);
+  it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
   traversal_inorder(tree, node->rhs, it);
 }
 
@@ -80,8 +87,8 @@ tree_node ** find_tree_node
   while (*node != NULL)
   {
     int const cmp = tree->key_compare((*node)->data, key);
-    if (cmp > 0) node = &((*node)->rhs);
-    else if (cmp < 0) node = &((*node)->lhs);
+    if (cmp > 0) node = &(*node)->rhs;
+    else if (cmp < 0) node = &(*node)->lhs;
     else /* cmp == 0 */
     {
       break;
@@ -141,7 +148,7 @@ bool bintree_put
   if (resized == NULL) return false;
 
   ++tree->len;
-  memcpy(&resized->data[tree->key_blk + tree->value_blk * resized->count++], value, tree->value_blk);
+  memcpy(resized->data + calc_value_offset(tree, resized->count++), value, tree->value_blk);
   *node = resized;
   return true;
 }
@@ -261,7 +268,7 @@ void const * bintree_get
   }
 
   if (matches != NULL) *matches = (*node)->count;
-  return tree->value_blk > 0 ? &(*node)->data[tree->key_blk] : NULL;
+  return tree->value_blk > 0 ? (*node)->data + calc_value_offset(tree, 0) : NULL;
 }
 
 void const * bintree_get_or_default

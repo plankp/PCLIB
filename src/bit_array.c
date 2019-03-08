@@ -20,7 +20,7 @@ static inline
 size_t
 compute_word_len(size_t bits)
 {
-  return bits / 32 + (bits % 32 == 0 ? 0 : 1);
+  return ((bits + 31) / 32) * 32;
 }
 
 bit_array

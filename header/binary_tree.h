@@ -74,7 +74,7 @@ void bintree_clear                    (binary_tree * const tree);
  * Puts a key with corresponding value into the tree.
  *
  * @param tree - Pointer to initialized binary tree
- * @param key - Key
+ * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
  * @returns true if operation succeeded
@@ -88,7 +88,7 @@ bool bintree_put                      (binary_tree * restrict const tree,
  * in the tree. If such key already exists, false is returned
  *
  * @param tree - Pointer to initialized binary tree
- * @param key - Key
+ * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
  * @returns true if operation succeeded, false if key already exists or
@@ -102,7 +102,7 @@ bool bintree_put_if_absent            (binary_tree * restrict const tree,
  * Removes a key along with its values
  *
  * @param tree - Pointer to initialized binary tree
- * @param pair - Key
+ * @param key - Pointer to key
  *
  * @return true if such a key was found and removed
  */
@@ -113,7 +113,7 @@ bool bintree_remove                   (binary_tree * restrict const tree,
  * Checks if specified key exists
  *
  * @param tree - Pointer to initialized binary tree
- * @param pair - Key
+ * @param key - Pointer to key
  *
  * @return true if such a key exists, false otherwise
  */
@@ -124,7 +124,7 @@ bool bintree_has_key                  (binary_tree const * restrict const tree,
  * Checks the number of keys that match of the specified key
  *
  * @param tree - Pointer to initialized binary tree
- * @param pair - Key
+ * @param key - Pointer to key
  *
  * @return the number of matching keys
  */
@@ -137,7 +137,7 @@ size_t bintree_count_matches          (binary_tree const * restrict const tree,
  * return NULL.
  *
  * @param tree - Pointer to initialized binary tree
- * @param pair - Key
+ * @param key - Pointer to key
  * @param out_matches - Pointer that will be filled with the number of matches; ignored if NULL
  *
  * @return the list of values (as this is a multimap) or NULL
@@ -152,7 +152,7 @@ void const * bintree_get              (binary_tree const * restrict const tree,
  * initialized with value size of 0, the default value will be returned.
  *
  * @param tree - Pointer to initialized binary tree
- * @param pair - Key
+ * @param key - Pointer to key
  * @param default_value - Default value
  *
  * @return the list of values (as this is a multimap) or the default value

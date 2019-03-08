@@ -18,7 +18,7 @@ void default_walker
 (void const * key_slot, size_t matches, void const * values)
 {
   /* inserting (char const *, int):
-   * - key: char const *
+   * - key: char const * const *
    * - value: int const *
    */
   char const * const * key = key_slot;

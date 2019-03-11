@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+typedef void (bintree_it)(void const *, size_t, void const *);
 typedef int (key_cmp)(void const *, void const *);
 
 typedef struct tree_node
@@ -162,15 +163,40 @@ void const * bintree_get_or_default   (binary_tree const * restrict const tree,
                                        void const * default_value);
 
 /**
- * Iterates through every key-value entry of the tree. The state of the tree,
+ * Iterates through every key-value entry of the tree. The state of the tree
  * should be kept consistent during the iteration process.
  *
  * @param tree - Pointer to initialized binary tree
  * @param it - An action to be performed on each entry
- * (void const * key, size_t matches, void const * values)
  */
 void bintree_foreach                  (binary_tree const * const tree,
-                                       void (* it)(void const *, size_t, void const *));
+                                       bintree_it * it);
+
+/**
+ * Iterates through every key-value entry of the tree that is greater than the
+ * specified key. The state of the tree should be kept consistent during the
+ * iteration process.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param it - An action to be performed on each entry
+ * @param key - Key being compared
+ */
+void bintree_foreach_gt               (binary_tree const * restrict const tree,
+                                       void const * restrict key,
+                                       bintree_it * it);
+
+/**
+ * Iterates through every key-value entry of the tree that is lesser than the
+ * specified key. The state of the tree should be kept consistent during the
+ * iteration process.
+ *
+ * @param tree - Pointer to initialized binary tree
+ * @param it - An action to be performed on each entry
+ * @param key - Key being compared
+ */
+void bintree_foreach_lt               (binary_tree const * restrict const tree,
+                                       void const * restrict key,
+                                       bintree_it * it);
 
 /**
  * Returns the size of the binary tree

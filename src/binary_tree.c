@@ -66,7 +66,7 @@ void free_subsequent_nodes
 
 static
 void traversal_inorder
-(binary_tree const * restrict const tree, tree_node const * node, void (* it)(void const *, size_t, void const *))
+(binary_tree const * restrict const tree, tree_node const * node, bintree_it * it)
 {
   if (node == NULL) return;
 
@@ -74,6 +74,30 @@ void traversal_inorder
   traversal_inorder(tree, node->lhs, it);
   it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
   traversal_inorder(tree, node->rhs, it);
+}
+
+static
+void traversal_inorder_gt
+(binary_tree const * restrict const tree, tree_node const * node, void const * const restrict key, bintree_it * it)
+{
+  if (node == NULL) return;
+
+  /* visit lhs, data then rhs */
+  traversal_inorder_gt(tree, node->lhs, key, it);
+  if (tree->key_compare(key, node->data) < 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  traversal_inorder_gt(tree, node->rhs, key, it);
+}
+
+static
+void traversal_inorder_lt
+(binary_tree const * restrict const tree, tree_node const * node, void const * const restrict key, bintree_it * it)
+{
+  if (node == NULL) return;
+
+  /* visit lhs, data then rhs */
+  traversal_inorder_lt(tree, node->lhs, key, it);
+  if (tree->key_compare(key, node->data) > 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  traversal_inorder_lt(tree, node->rhs, key, it);
 }
 
 static
@@ -86,7 +110,7 @@ tree_node ** find_tree_node
   tree_node * const * node = &tree->root;
   while (*node != NULL)
   {
-    int const cmp = tree->key_compare((*node)->data, key);
+    int const cmp = tree->key_compare(key, (*node)->data);
     if (cmp > 0) node = &(*node)->rhs;
     else if (cmp < 0) node = &(*node)->lhs;
     else /* cmp == 0 */
@@ -279,9 +303,21 @@ void const * bintree_get_or_default
 }
 
 void bintree_foreach
-(binary_tree const * const tree, void (* it)(void const *, size_t, void const *))
+(binary_tree const * const tree, bintree_it * it)
 {
   traversal_inorder(tree, tree->root, it);
+}
+
+void bintree_foreach_gt
+(binary_tree const * restrict const tree, void const * restrict key, bintree_it * it)
+{
+  traversal_inorder_gt(tree, tree->root, key, it);
+}
+
+void bintree_foreach_lt
+(binary_tree const * restrict const tree, void const * restrict key, bintree_it * it)
+{
+  traversal_inorder_lt(tree, tree->root, key, it);
 }
 
 size_t bintree_size

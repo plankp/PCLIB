@@ -98,6 +98,12 @@ int main
   str = "Beta";
   printf("Beta --> %d\n", *(int const *) bintree_get(&tree, &str, NULL));
 
+  str = "a";
+  printf("\nThings lesser than \"a\":\n");
+  bintree_foreach_lt(&tree, &str, &default_walker);
+  printf("\nThings greater than \"a\":\n");
+  bintree_foreach_gt(&tree, &str, &default_walker);
+
   free_bintree(&tree);
   return 0;
 }

@@ -251,6 +251,12 @@ size_t arrlist_capacity
   return list->cap;
 }
 
+void * arrlist_data
+(array_list * const list)
+{
+  return list->mem;
+}
+
 bool arrlist_remove_first
 (array_list * restrict const list, void * restrict out)
 {

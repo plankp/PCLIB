@@ -203,6 +203,15 @@ size_t arrlist_size           (array_list const * const list);
 size_t arrlist_capacity       (array_list const * const list);
 
 /**
+ * Returns a pointer to the internal buffer
+ *
+ * @param list - Pointer to initialized array list
+ *
+ * @return pointer to internal buffer, must not be freed
+ */
+void * arrlist_data           (array_list * const list);
+
+/**
  * Removes the first item from the list.
  *
  * @param list - Pointer to initialized array list

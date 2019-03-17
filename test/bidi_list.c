@@ -2,11 +2,17 @@
 
 #include <stdio.h>
 #include <assert.h>
-
-#include <stdio.h>
-#include <assert.h>
 #include <stddef.h>
 #include <string.h>
+
+static
+bool pred_non_alpha
+(void const * ptr)
+{
+  signed char const ch = *(char const *) ptr;
+  bool r = ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z');
+  return !r;
+}
 
 int main
 (int argc, char ** argv)
@@ -117,6 +123,43 @@ int main
   }
 
   printf("FWD %s\n", output);
+
+  /* remove all the character 'l' (there are 3 of them) */
+
+  for (size_t i = 0; i < str_len; ++i)
+  {
+    list_add_first(&list, hello_world + i);
+  }
+
+  char const ch_l = 'l';
+  assert(list_remove_match(&list, &ch_l) == 3);
+  assert(list_size(&list) == str_len - 3);
+
+  for (char * ptr = output; list_size(&list) > 0; ++ptr)
+  {
+    list_remove_first(&list, ptr);
+    *(ptr + 1) = 0;
+  }
+
+  printf("DONE %s\n", output);
+
+  /* remove all non alphabetical characters (there are 3 of them) */
+
+  for (size_t i = 0; i < str_len; ++i)
+  {
+    list_add_last(&list, hello_world + i);
+  }
+
+  assert(list_remove_if(&list, &pred_non_alpha) == 3);
+  assert(list_size(&list) == str_len - 3);
+
+  for (char * ptr = output; list_size(&list) > 0; ++ptr)
+  {
+    list_remove_last(&list, ptr);
+    *(ptr + 1) = 0;
+  }
+
+  printf("DONE %s\n", output);
 
   free_list(&list);
   return 0;

@@ -157,4 +157,27 @@ void const * list_get_first   (bidi_list const * const list);
  */
 void const * list_get_last    (bidi_list const * const list);
 
+
+/**
+ * Remove all matching elements from the forward list
+ *
+ * @param list - Pointer to initialized forward list
+ * @param el - Matching element
+ *
+ * @return number of elements removed
+ */
+size_t list_remove_match      (bidi_list * restrict const list,
+                               void const * restrict const out);
+
+/**
+ * Remove all matching elements from the forward list
+ *
+ * @param list - Pointer to initialized forward list
+ * @param pred - Predicate to check if element matches
+ *
+ * @return number of elements removed
+ */
+size_t list_remove_if         (bidi_list * const list,
+                               bool (* pred)(void const *));
+
 #endif

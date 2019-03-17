@@ -246,3 +246,65 @@ void const * list_get_last
 {
   return list->last == NULL ? NULL : list->last->data;
 }
+
+size_t list_remove_match
+(bidi_list * restrict const list, void const * restrict const out)
+{
+  size_t rem_count = 0;
+  bidi_entry ** entry = &list->first;
+  while (*entry != NULL)
+  {
+    if (memcmp((*entry)->data, out, list->blk) == 0)
+    {
+      /* matches: remove that node, make entry point to next node */
+      bidi_entry * del_node = *entry;
+      remove_at(del_node);
+      if (del_node == list->last) list->last = del_node->prev;
+      *entry = del_node->next;
+
+      del_node->prev = NULL;
+      del_node->next = NULL;
+      free_subsequent_nodes(del_node);
+
+      ++rem_count;
+    }
+    else
+    {
+      /* move to next node */
+      entry = &(*entry)->next;
+    }
+  }
+  list->len -= rem_count;
+  return rem_count;
+}
+
+size_t list_remove_if
+(bidi_list * restrict const list, bool (* pred)(void const *))
+{
+  size_t rem_count = 0;
+  bidi_entry ** entry = &list->first;
+  while (*entry != NULL)
+  {
+    if (pred((*entry)->data))
+    {
+      /* matches: remove that node, make entry point to next node */
+      bidi_entry * del_node = *entry;
+      remove_at(del_node);
+      if (del_node == list->last) list->last = del_node->prev;
+      *entry = del_node->next;
+
+      del_node->prev = NULL;
+      del_node->next = NULL;
+      free_subsequent_nodes(del_node);
+
+      ++rem_count;
+    }
+    else
+    {
+      /* move to next node */
+      entry = &(*entry)->next;
+    }
+  }
+  list->len -= rem_count;
+  return rem_count;
+}

@@ -59,6 +59,13 @@ void free_fwdlist         (forward_list * const list);
 void fwdlist_clear        (forward_list * const list);
 
 /**
+ * Reverses a forward list
+ *
+ * @param list - Pointer to initialized forward list
+ */
+void fwdlist_reverse      (forward_list * const list);
+
+/**
  * Iterates through every item of the list. The state of the list should be
  * kept consistent during the iteration process.
  *

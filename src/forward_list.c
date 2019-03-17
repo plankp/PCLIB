@@ -60,6 +60,21 @@ void fwdlist_clear
   }
 }
 
+void fwdlist_reverse
+(forward_list * const list)
+{
+  forward_entry * entry = list->mem;
+  forward_entry * prev = NULL;
+  while (entry != NULL)
+  {
+    forward_entry * const next = entry->next;
+    entry->next = prev;
+    prev = entry;
+    entry = next;
+  }
+  list->mem = prev;
+}
+
 void fwdlist_foreach
 (forward_list const * const list, void (* it)(void const *))
 {

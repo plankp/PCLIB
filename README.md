@@ -13,9 +13,10 @@ If you need any of the following, this is the right place for you:
 *  Array lists
 *  Hash maps
 *  Bit arrays
+*  Binary tree
+*  Linked list (single and double)
 *  Optional type (null wrapper)
 *  Closures (including consumers, predicates, and suppliers)
-*  Binary Tree
 *  Named param function
 
 ## How to build this library

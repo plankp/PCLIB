@@ -19,7 +19,7 @@ int main
 
   for (size_t i = 0; i < str_len; ++i)
   {
-    fwdlist_push(&list, hello_world + i);
+    fwdlist_add_first(&list, hello_world + i);
   }
 
   assert(fwdlist_size(&list) == str_len);
@@ -27,7 +27,7 @@ int main
   char * ptr = output;
   while (fwdlist_size(&list) > 0)
   {
-    fwdlist_pop(&list, ptr++);
+    fwdlist_remove_first(&list, ptr++);
   }
 
   printf("DONE %s\n", output);

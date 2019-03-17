@@ -78,13 +78,13 @@ size_t fwdlist_size
   return list->len;
 }
 
-void const * fwdlist_peek
+void const * fwdlist_get_first
 (forward_list const * const list)
 {
   return list->mem == NULL ? NULL : list->mem->data;
 }
 
-bool fwdlist_push
+bool fwdlist_add_first
 (forward_list * restrict const list, void const * restrict el)
 {
   forward_entry * new_ent = malloc(sizeof(forward_entry) + list->blk);
@@ -99,7 +99,7 @@ bool fwdlist_push
   return true;
 }
 
-bool fwdlist_pop
+bool fwdlist_remove_first
 (forward_list * restrict const list, void * restrict out)
 {
   if (list->len == 0) return false;

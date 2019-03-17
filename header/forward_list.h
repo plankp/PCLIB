@@ -78,18 +78,18 @@ void fwdlist_foreach      (forward_list const * const list,
 size_t fwdlist_size       (forward_list const * const list);
 
 /**
- * Pushes a new element to the front of the forward list
+ * Inserts a new element to the front of the forward list
  *
  * @param list - Pointer to initialized forward list
  * @param el - Element being pushed
  *
  * @return true if process was successful
  */
-bool fwdlist_push         (forward_list * restrict const list,
-                           void const * restrict el);
+bool fwdlist_add_first          (forward_list * restrict const list,
+                                 void const * restrict el);
 
 /**
- * Pops a new element to the front of the forward list
+ * Removes an element from the front of the forward list
  *
  * @param list - Pointer to initialized forward list
  * @param out - Pointer that will be filled with the removed value; ignored if
@@ -97,16 +97,16 @@ bool fwdlist_push         (forward_list * restrict const list,
  *
  * @return true if process was successful
  */
-bool fwdlist_pop          (forward_list * restrict const list,
-                           void * restrict out);
+bool fwdlist_remove_first       (forward_list * restrict const list,
+                                 void * restrict out);
 
 /**
- * Returns pointer to the front of the forward list
+ * Returns pointer to the data of the first element of the forward list
  *
  * @param list - Pointer to initialized forward list
  *
- * @return pointer to the item, NULL if list is empty
+ * @return pointer to the data, NULL if list is empty
  */
-void const * fwdlist_peek (forward_list const * const list);
+void const * fwdlist_get_first  (forward_list const * const list);
 
 #endif

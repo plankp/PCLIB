@@ -235,13 +235,13 @@ bool list_remove_last
   return true;
 }
 
-void const * list_peek_first
+void const * list_get_first
 (bidi_list const * const list)
 {
   return list->first == NULL ? NULL : list->first->data;
 }
 
-void const * list_peek_last
+void const * list_get_last
 (bidi_list const * const list)
 {
   return list->last == NULL ? NULL : list->last->data;

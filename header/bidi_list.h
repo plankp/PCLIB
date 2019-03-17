@@ -35,30 +35,126 @@ typedef struct bidi_list
   bidi_entry * last;
 } bidi_list;
 
+/**
+ * Initializes a bidirectional (double linked) list with each slot being able
+ * to store at least a data size.
+ *
+ * @param list - Pointer to an uninitialized bidi list
+ * @param data_size - Minimum capacity of each slot
+ *
+ * @return true if data_siz was at least 1
+ */
 bool init_list                (bidi_list * list, size_t data_size);
 
+/**
+ * Frees a bidi list, making it the same as uninitialized.
+ *
+ * @param list - Pointer to initialized bidi list
+ */
 void free_list                (bidi_list * list);
 
+/**
+ * Clears a bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ */
 void list_clear               (bidi_list * const list);
 
+/**
+ * Reverses a bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ */
 void list_reverse             (bidi_list * const list);
 
-void list_foreach             (bidi_list const * const list, void (* it)(void const *));
+/**
+ * Iterates from the first to last item of the list. The state of the list
+ * should be kept consistent during the iteration process.
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param it - An action to be performed on each item
+ */
+void list_foreach             (bidi_list const * const list,
+                               void (* it)(void const *));
 
-void list_reveach             (bidi_list const * const list, void (* it)(void const *));
+/**
+ * Iterates from the last to first item of the list. The state of the list
+ * should be kept consistent during the iteration process.
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param it - An action to be performed on each item
+ */
+void list_reveach             (bidi_list const * const list,
+                               void (* it)(void const *));
 
+/**
+ * Returns the size of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ *
+ * @return size of the bidi list
+ */
 size_t list_size              (bidi_list const * const list);
 
+/**
+ * Inserts a new element to the front of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param el - Element being added
+ *
+ * @return true if process was successful
+ */
 bool list_add_first           (bidi_list * restrict const list, void const * restrict el);
 
+/**
+ * Inserts a new element to the back of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param el - Element being added
+ *
+ * @return true if process was successful
+ */
 bool list_add_last            (bidi_list * restrict const list, void const * restrict el);
 
+/**
+ * Removes an element to the front of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param out - Pointer that will be filled with the removed value; ignored if
+ *              NULL
+ *
+ * @return true if process was successful
+ */
 bool list_remove_first        (bidi_list * restrict const list, void * restrict out);
 
+/**
+ * Removes an element to the back of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param out - Pointer that will be filled with the removed value; ignored if
+ *              NULL
+ *
+ * @return true if process was successful
+ */
 bool list_remove_last         (bidi_list * restrict const list, void * restrict out);
 
-void const * list_peek_first  (bidi_list const * const list);
+/**
+ * Returns pointer to the data of the first element of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ *
+ * @return pointer to the data, NULL if list is empty
+ */
+void const * list_get_first   (bidi_list const * const list);
 
-void const * list_peek_last   (bidi_list const * const list);
+
+/**
+ * Returns pointer to the data of the last element of the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ *
+ * @return pointer to the data, NULL if list is empty
+ */
+void const * list_get_last    (bidi_list const * const list);
 
 #endif

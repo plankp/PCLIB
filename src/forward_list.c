@@ -117,3 +117,59 @@ bool fwdlist_remove_first
 
   return true;
 }
+
+size_t fwdlist_remove_match
+(forward_list * restrict const list, void const * restrict const out)
+{
+  size_t rem_count = 0;
+  forward_entry ** entry = &list->mem;
+  while (*entry != NULL)
+  {
+    if (memcmp((*entry)->data, out, list->blk) == 0)
+    {
+      /* matches: remove that node, make entry point to next node */
+      forward_entry * del_node = *entry;
+      *entry = del_node->next;
+
+      del_node->next = NULL;
+      free_subsequent_nodes(del_node);
+
+      ++rem_count;
+    }
+    else
+    {
+      /* move to next node */
+      entry = &(*entry)->next;
+    }
+  }
+  list->len -= rem_count;
+  return rem_count;
+}
+
+size_t fwdlist_remove_if
+(forward_list * restrict const list, bool (* pred)(void const *))
+{
+  size_t rem_count = 0;
+  forward_entry ** entry = &list->mem;
+  while (*entry != NULL)
+  {
+    if (pred((*entry)->data))
+    {
+      /* matches: remove that node, make entry point to next node */
+      forward_entry * del_node = *entry;
+      *entry = del_node->next;
+
+      del_node->next = NULL;
+      free_subsequent_nodes(del_node);
+
+      ++rem_count;
+    }
+    else
+    {
+      /* move to next node */
+      entry = &(*entry)->next;
+    }
+  }
+  list->len -= rem_count;
+  return rem_count;
+}

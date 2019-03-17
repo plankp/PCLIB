@@ -109,4 +109,26 @@ bool fwdlist_remove_first       (forward_list * restrict const list,
  */
 void const * fwdlist_get_first  (forward_list const * const list);
 
+/**
+ * Remove all matching elements from the forward list
+ *
+ * @param list - Pointer to initialized forward list
+ * @param el - Matching element
+ *
+ * @return number of elements removed
+ */
+size_t fwdlist_remove_match     (forward_list * restrict const list,
+                                 void const * restrict const out);
+
+/**
+ * Remove all matching elements from the forward list
+ *
+ * @param list - Pointer to initialized forward list
+ * @param pred - Predicate to check if element matches
+ *
+ * @return number of elements removed
+ */
+size_t fwdlist_remove_if        (forward_list * const list,
+                                 bool (* pred)(void const *));
+
 #endif

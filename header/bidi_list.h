@@ -117,7 +117,7 @@ bool list_add_first           (bidi_list * restrict const list, void const * res
 bool list_add_last            (bidi_list * restrict const list, void const * restrict el);
 
 /**
- * Removes an element to the front of the bidi list
+ * Removes an element from the front of the bidi list
  *
  * @param list - Pointer to initialized bidi list
  * @param out - Pointer that will be filled with the removed value; ignored if
@@ -128,7 +128,7 @@ bool list_add_last            (bidi_list * restrict const list, void const * res
 bool list_remove_first        (bidi_list * restrict const list, void * restrict out);
 
 /**
- * Removes an element to the back of the bidi list
+ * Removes an element from the back of the bidi list
  *
  * @param list - Pointer to initialized bidi list
  * @param out - Pointer that will be filled with the removed value; ignored if

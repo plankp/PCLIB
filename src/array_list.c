@@ -232,13 +232,13 @@ size_t arrlist_capacity
   return list->cap;
 }
 
-bool arrlist_push
-(array_list * restrict const list, void const * restrict el)
+bool arrlist_remove_first
+(array_list * restrict const list, void * restrict out)
 {
-  return arrlist_add(list, el);
+  return arrlist_remove(list, 0, out);
 }
 
-bool arrlist_pop
+bool arrlist_remove_last
 (array_list * restrict const list, void * restrict out)
 {
   const size_t len = list->len;

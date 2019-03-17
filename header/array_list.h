@@ -196,10 +196,16 @@ size_t arrlist_size           (array_list const * const list);
 size_t arrlist_capacity       (array_list const * const list);
 
 /**
- * (same as arrlist_add)
+ * Removes the first item from the list.
+ *
+ * @param list - Pointer to initialized array list
+ * @param out - Pointer that will be filled with the removed value; ignored if
+ *              NULL
+ *
+ * @return true if item was successfully removed
  */
-bool arrlist_push             (array_list * restrict const list,
-                               void const * restrict el);
+bool arrlist_remove_first     (array_list * restrict const list,
+                               void * restrict out);
 
 /**
  * Removes the last item from the list.
@@ -210,7 +216,7 @@ bool arrlist_push             (array_list * restrict const list,
  *
  * @return true if item was successfully removed
  */
-bool arrlist_pop              (array_list * restrict const list,
+bool arrlist_remove_last      (array_list * restrict const list,
                                void * restrict out);
 
 #endif

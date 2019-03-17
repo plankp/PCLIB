@@ -21,15 +21,15 @@ int main
 	for (i = 0; i < 10; ++i)
 	{
 		int val = i + 1;
-		arrlist_push(&list, &val);
+		arrlist_add(&list, &val);
 	}
 	arrlist_foreach(&list, &default_walker);
 	printf("\nSize is %zu\n", arrlist_size(&list));
 
 	int val = 10;
-	arrlist_pop(&list, &val);
-	arrlist_pop(&list, &val);
-	arrlist_pop(&list, &val);
+	arrlist_remove_last(&list, &val);
+	arrlist_remove_last(&list, &val);
+	arrlist_remove_last(&list, &val);
 	arrlist_compact(&list);
 	assert(("val should be 8", val == 8));
 

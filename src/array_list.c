@@ -121,6 +121,25 @@ bool arrlist_ensure_capacity
   return true;
 }
 
+void arrlist_reverse
+(array_list * const list)
+{
+  size_t const len = list->len;
+  size_t const midpoint = len / 2;
+  size_t const blk = list->blk;
+
+  char temp_buf[blk];
+  for (size_t i = 0; i < midpoint; ++i)
+  {
+    /* swap [i] with [len - i - 1] */
+    char * const near = list->mem + i * blk;
+    char * const far = list->mem + (len - i - 1) * blk;
+    memcpy(temp_buf, near, blk);
+    memmove(near, far, blk);
+    memcpy(far, temp_buf, blk);
+  }
+}
+
 bool arrlist_add
 (array_list * restrict const list, void const * restrict el)
 {

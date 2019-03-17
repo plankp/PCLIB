@@ -86,6 +86,13 @@ void arrlist_clear            (array_list * const list);
 void arrlist_compact          (array_list * const list);
 
 /**
+ * Reverses an array list
+ *
+ * @param list - Pointer to initialized array list
+ */
+void arrlist_reverse          (array_list * const list);
+
+/**
  * Ensures the capacity is at least n.
  *
  * @param list - Pointer to initialized array list

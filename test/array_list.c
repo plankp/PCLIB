@@ -46,6 +46,10 @@ int main
 	arrlist_foreach(&list, &default_walker);
 	printf("\nSize is %zu\n", arrlist_size(&list));
 
+	arrlist_reverse(&list);
+	arrlist_foreach(&list, &default_walker);
+	printf("\nSize is %zu\n", arrlist_size(&list));
+
 	arrlist_clear(&list);
 	arrlist_foreach(&list, &default_walker);
 	printf("\nSize is %zu\n", arrlist_size(&list));

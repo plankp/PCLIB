@@ -68,6 +68,15 @@ void list_clear               (bidi_list * const list);
 void list_reverse             (bidi_list * const list);
 
 /**
+ * Sorts the bidi list
+ *
+ * @param list - Pointer to initialized bidi list
+ * @param comp - Comparator
+ */
+void list_sort                (bidi_list * const list,
+                               int (* comp)(void const *, void const *));
+
+/**
  * Iterates from the first to last item of the list. The state of the list
  * should be kept consistent during the iteration process.
  *

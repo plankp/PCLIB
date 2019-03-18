@@ -131,6 +131,108 @@ void list_reverse
   list->last = temp;
 }
 
+static
+bidi_entry * merge_list
+(bidi_entry * split1, bidi_entry * split2, int (* comp)(void const *, void const *))
+{
+  bidi_entry * newhead = NULL;
+
+  if (split1 == NULL) return split2;
+  if (split2 == NULL) return split1;
+
+  /* recursively merge */
+  bidi_entry * sub;
+  if (comp(split1->data, split2->data) <= 0)
+  {
+    newhead = split1;
+    sub = merge_list(split1->next, split2, comp);
+  }
+  else
+  {
+    newhead = split2;
+    sub = merge_list(split1, split2->next, comp);
+  }
+
+  newhead->prev = NULL;
+  newhead->next = sub;
+  sub->prev = newhead;
+
+  return newhead;
+}
+
+static
+void split_list
+(bidi_entry * head, bidi_entry ** split1, bidi_entry ** split2)
+{
+  /* cut list in half */
+  bidi_entry * slow = head;
+  bidi_entry * fast = head->next;
+
+  /* fast travels by 2, slow travels by 1
+   * by the time fast reaches n, slow will reach n / 2
+   * if n is the end, n / 2 is the middle!
+   */
+  while(fast != NULL)
+  {
+    fast = fast->next;
+    if (fast != NULL)
+    {
+      slow = slow->next;
+      fast = fast->next;
+    }
+  }
+
+  *split1 = head;
+  *split2 = slow->next;
+  /* spliting */
+  slow->next = NULL;
+}
+
+static
+void sort_helper
+(bidi_entry ** ref_head, int (* comp)(void const *, void const *))
+{
+  /* uses mergesort */
+  bidi_entry * head = *ref_head;
+
+  /* empty or lists with only one element is sorted */
+  if (head == NULL || head->next == NULL) return;
+
+  /* split the list in two halves */
+  bidi_entry * split1;
+  bidi_entry * split2;
+  split_list(head, &split1, &split2);
+
+  /* recursively sort the two halves */
+  sort_helper(&split1, comp);
+  sort_helper(&split2, comp);
+
+  /* merge two sorted list */
+  *ref_head = merge_list(split1, split2, comp);
+}
+
+void list_sort
+(bidi_list * const list, int (* comp)(void const *, void const *))
+{
+  if (list->len > 1)
+  {
+    sort_helper(&list->first, comp);
+
+    /* now need to rebuild list->last */
+    bidi_entry * entry = list->first->next->next;
+    while (true)
+    {
+      bidi_entry * const next = entry->next;
+      if (next == NULL)
+      {
+        list->last = entry;
+        break;
+      }
+      entry = next;
+    }
+  }
+}
+
 void list_foreach
 (bidi_list const * const list, void (* it)(void const *))
 {

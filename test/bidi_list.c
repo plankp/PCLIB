@@ -14,6 +14,15 @@ bool pred_non_alpha
   return !r;
 }
 
+static
+int comparator
+(void const * a, void const * b)
+{
+  signed char const ch_a = *(char const *) a;
+  signed char const ch_b = *(char const *) b;
+  return ch_a - ch_b;
+}
+
 int main
 (int argc, char ** argv)
 {
@@ -152,6 +161,23 @@ int main
 
   assert(list_remove_if(&list, &pred_non_alpha) == 3);
   assert(list_size(&list) == str_len - 3);
+
+  for (char * ptr = output; list_size(&list) > 0; ++ptr)
+  {
+    list_remove_last(&list, ptr);
+    *(ptr + 1) = 0;
+  }
+
+  printf("DONE %s\n", output);
+
+  /* sort all the elements */
+
+  for (size_t i = 0; i < str_len; ++i)
+  {
+    list_add_last(&list, hello_world + i);
+  }
+
+  list_sort(&list, &comparator);
 
   for (char * ptr = output; list_size(&list) > 0; ++ptr)
   {

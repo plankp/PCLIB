@@ -66,6 +66,15 @@ void fwdlist_clear        (forward_list * const list);
 void fwdlist_reverse      (forward_list * const list);
 
 /**
+ * Sorts the forward list
+ *
+ * @param list - Pointer to initialized forward list
+ * @param comp - Comparator
+ */
+void fwdlist_sort         (forward_list * const list,
+                           int (* comp)(void const *, void const *));
+
+/**
  * Iterates through every item of the list. The state of the list should be
  * kept consistent during the iteration process.
  *

@@ -20,12 +20,26 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * The growth function for each node of the multimap.
+ *
+ * By default, the capacity is unscaled (no elements are preallocated)
+ *
+ * @param n - The precomputed new capacity
+ *
+ * @return value >= n
+ */
+#ifndef TMMAP_GROW /* (size_t n) */
+#define TMMAP_GROW(n) (n)
+#endif
+
 typedef void (tmmap_it)(void const *, size_t, void const *);
 typedef int (key_cmp)(void const *, void const *);
 
 typedef struct tmmap_node
 {
   size_t count;
+  size_t cap;
   struct tmmap_node * lhs; /* less than */
   struct tmmap_node * rhs; /* more than */
   char data[];

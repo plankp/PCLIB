@@ -38,10 +38,12 @@ tmmap_node *create_new_node
 (tree_multimap const * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* create a blank node */
-  tmmap_node *new_node = malloc(calc_node_size(tree, 1));
+  size_t const alloc_cap = TMMAP_GROW(1);
+  tmmap_node *new_node = malloc(calc_node_size(tree, alloc_cap));
   if (new_node == NULL) return NULL;
 
   new_node->count = 1;
+  new_node->cap = alloc_cap;
   new_node->lhs = NULL;
   new_node->rhs = NULL;
 
@@ -168,12 +170,19 @@ bool tmmap_put
 
   /* resize the current node */
   tmmap_node * current = *node;
-  tmmap_node * resized = realloc(current, calc_node_size(tree, current->count + 1));
-  if (resized == NULL) return false;
+  size_t const new_size = current->count + 1;
+  if (current->cap < new_size)
+  {
+    size_t const new_cap = TMMAP_GROW(new_size);
+    tmmap_node * resized = realloc(current, calc_node_size(tree, new_cap));
+    if (resized == NULL) return false;
+    resized->cap = new_cap;
+    current = resized;
+  }
 
   ++tree->len;
-  memcpy(resized->data + calc_value_offset(tree, resized->count++), value, tree->value_blk);
-  *node = resized;
+  memcpy(current->data + calc_value_offset(tree, current->count++), value, tree->value_blk);
+  *node = current;
   return true;
 }
 

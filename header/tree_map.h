@@ -23,19 +23,19 @@
 typedef void (tmap_it)(void const *, void const *);
 typedef int (key_cmp)(void const *, void const *);
 
-typedef struct tree_node
+typedef struct tmap_node
 {
-  struct tree_node * lhs; /* less than */
-  struct tree_node * rhs; /* more than */
+  struct tmap_node * lhs; /* less than */
+  struct tmap_node * rhs; /* more than */
   char data[];
-} tree_node;
+} tmap_node;
 
 typedef struct tree_map
 {
   size_t len;
   size_t key_blk;
   size_t value_blk;
-  tree_node * root;
+  tmap_node * root;
   key_cmp * key_compare;
 } tree_map;
 

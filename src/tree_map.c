@@ -20,11 +20,11 @@
 #include <string.h>
 
 static
-tree_node *create_new_node
+tmap_node *create_new_node
 (tree_map const * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* create a blank node */
-  tree_node *new_node = malloc(sizeof(tree_node) + tree->key_blk + tree->value_blk);
+  tmap_node *new_node = malloc(sizeof(tmap_node) + tree->key_blk + tree->value_blk);
   if (new_node == NULL) return NULL;
 
   new_node->lhs = NULL;
@@ -40,7 +40,7 @@ tree_node *create_new_node
 
 static
 void free_subsequent_nodes
-(tree_node * node)
+(tmap_node * node)
 {
   if (node == NULL) return;
 
@@ -51,7 +51,7 @@ void free_subsequent_nodes
 
 static
 void traversal_inorder
-(tree_map const * restrict const tree, tree_node const * node, tmap_it * it)
+(tree_map const * restrict const tree, tmap_node const * node, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -63,7 +63,7 @@ void traversal_inorder
 
 static
 void traversal_inorder_gt
-(tree_map const * restrict const tree, tree_node const * node, void const * const restrict key, tmap_it * it)
+(tree_map const * restrict const tree, tmap_node const * node, void const * const restrict key, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -75,7 +75,7 @@ void traversal_inorder_gt
 
 static
 void traversal_inorder_lt
-(tree_map const * restrict const tree, tree_node const * node, void const * const restrict key, tmap_it * it)
+(tree_map const * restrict const tree, tmap_node const * node, void const * const restrict key, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -86,13 +86,13 @@ void traversal_inorder_lt
 }
 
 static
-tree_node ** find_tree_node
+tmap_node ** find_tree_node
 (tree_map const * restrict const tree, void const * restrict const key)
 {
   /* this is more like a multimap meaning you can have
    * multiple nodes with the same key (compare --> 0)
    */
-  tree_node * const * node = &tree->root;
+  tmap_node * const * node = &tree->root;
   while (*node != NULL)
   {
     int const cmp = tree->key_compare(key, (*node)->data);
@@ -103,7 +103,7 @@ tree_node ** find_tree_node
       break;
     }
   }
-  return (tree_node **) node;
+  return (tmap_node **) node;
 }
 
 bool init_tmap
@@ -140,7 +140,7 @@ void tmap_clear
 bool tmap_put
 (tree_map * restrict const tree, void const * restrict key, void const * restrict value)
 {
-  tree_node ** node = find_tree_node(tree, key);
+  tmap_node ** node = find_tree_node(tree, key);
   if (*node != NULL)
   {
     /* key already exists, need to update the value */
@@ -149,7 +149,7 @@ bool tmap_put
   }
 
   /* *node == NULL, which means creating a blank node */
-  tree_node *new_node = create_new_node(tree, key, value);
+  tmap_node *new_node = create_new_node(tree, key, value);
   if (new_node == NULL) return false;
 
   ++tree->len;
@@ -160,12 +160,12 @@ bool tmap_put
 bool tmap_put_if_absent
 (tree_map * restrict const tree, void const * restrict key, void const * restrict value)
 {
-  tree_node ** node = find_tree_node(tree, key);
+  tmap_node ** node = find_tree_node(tree, key);
 
   if (*node != NULL) return false;
 
   /* *node == NULL, which means creating a blank node */
-  tree_node *new_node = create_new_node(tree, key, value);
+  tmap_node *new_node = create_new_node(tree, key, value);
   if (new_node == NULL) return false;
 
   ++tree->len;
@@ -176,11 +176,11 @@ bool tmap_put_if_absent
 bool tmap_remove
 (tree_map * restrict const tree, void const * restrict key)
 {
-  tree_node ** node = find_tree_node(tree, key);
+  tmap_node ** node = find_tree_node(tree, key);
 
   if (*node == NULL) return false;
 
-  tree_node * current = *node;
+  tmap_node * current = *node;
   --tree->len;
 
   if (current->lhs == NULL)
@@ -204,8 +204,8 @@ bool tmap_remove
   }
 
   /* node contains both children: pull up the minimum node of rhs */
-  tree_node *parent = current;
-  tree_node *min = current->rhs;
+  tmap_node *parent = current;
+  tmap_node *min = current->rhs;
   while (min->lhs != NULL)
   {
     parent = min;
@@ -255,7 +255,7 @@ bool tmap_has_key
 void const * tmap_get
 (tree_map const * restrict const tree, void const * restrict key)
 {
-  tree_node ** node = find_tree_node(tree, key);
+  tmap_node ** node = find_tree_node(tree, key);
 
   if (*node == NULL) return NULL;
 

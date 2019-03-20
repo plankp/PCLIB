@@ -55,9 +55,10 @@ typedef struct tree_multimap
 } tree_multimap;
 
 /**
- * Initializes a tree map with the specified key comparator and value size.
+ * Initializes a tree multimap with the specified key comparator and value
+ * size.
  *
- * @param tree - Pointer to an uninitialized tree map
+ * @param tree - Pointer to an uninitialized tree multimap
  * @param key_compare - Key relational comparator
  * @param key_size - Size of each key
  * @param value_size - Size of each value
@@ -70,23 +71,23 @@ bool init_tmmap                       (tree_multimap * const tree,
                                        size_t value_size);
 
 /**
- * Frees a tree map, making it the same as uninitialized.
+ * Frees a tree multimap, making it the same as uninitialized.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  */
 void free_tmmap                       (tree_multimap * const tree);
 
 /**
- * Clears a tree map by deallocating all nodes and setting size to zero.
+ * Clears a tree multimap by deallocating all nodes and setting size to zero.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  */
 void tmmap_clear                      (tree_multimap * const tree);
 
 /**
  * Puts a key with corresponding value into the tree.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
@@ -100,7 +101,7 @@ bool tmmap_put                        (tree_multimap * restrict const tree,
  * Puts a key with corresponding value into the tree only if key does not
  * exist in the tree. If such key already exists, false is returned
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
@@ -114,7 +115,7 @@ bool tmmap_put_if_absent              (tree_multimap * restrict const tree,
 /**
  * Removes a key along with its values
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return true if such a key was found and removed
@@ -126,9 +127,9 @@ bool tmmap_remove                     (tree_multimap * restrict const tree,
  * Removes a range of values associated with the key. If the upper bound of
  * the range is more than the amount of values associated, it only removes up
  * until the last associated value. If the range covers all or more than all
- * values, then the key is removed from the map.
+ * values, then the key is removed from the multimap.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param lo - Lower bound of the removal range
  * @param hi - Upper bound of the removal range
@@ -143,7 +144,7 @@ size_t tmmap_remove_values            (tree_multimap * restrict const tree,
 /**
  * Checks if specified key exists
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return true if such a key exists, false otherwise
@@ -154,7 +155,7 @@ bool tmmap_has_key                    (tree_multimap const * restrict const tree
 /**
  * Checks the number of keys that match of the specified key
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return the number of matching keys
@@ -167,7 +168,7 @@ size_t tmmap_count_matches            (tree_multimap const * restrict const tree
  * initialized with value size of 0, there is no value, and so will always
  * return NULL.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param out_matches - Pointer that will be filled with the number of
  *                      matches; ignored if NULL
@@ -183,7 +184,7 @@ void const* tmmap_get                 (tree_multimap const * restrict const tree
  * does not exist because it has not been inserted yet or if tree was
  * initialized with value size of 0, the default value will be returned.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param default_value - Default value
  *
@@ -197,7 +198,7 @@ void const* tmmap_get_or_default      (tree_multimap const * restrict const tree
  * Iterates through every key-value entry of the tree. The state of the tree
  * should be kept consistent during the iteration process.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  */
 void tmmap_foreach                    (tree_multimap const * const tree,
@@ -208,7 +209,7 @@ void tmmap_foreach                    (tree_multimap const * const tree,
  * specified key. The state of the tree should be kept consistent during the
  * iteration process.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
@@ -221,7 +222,7 @@ void tmmap_foreach_gt                 (tree_multimap const * restrict const tree
  * specified key. The state of the tree should be kept consistent during the
  * iteration process.
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
@@ -230,11 +231,11 @@ void tmmap_foreach_lt                 (tree_multimap const * restrict const tree
                                        tmmap_it * it);
 
 /**
- * Returns the size of the tree map
+ * Returns the size of the tree multimap
  *
- * @param tree - Pointer to initialized tree map
+ * @param tree - Pointer to initialized tree multimap
  *
- * @return size of the tree map
+ * @return size of the tree multimap
  */
 size_t tmmap_size                     (tree_multimap const * const tree);
 

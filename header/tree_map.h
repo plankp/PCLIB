@@ -20,12 +20,11 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef void (tmap_it)(void const *, size_t, void const *);
+typedef void (tmap_it)(void const *, void const *);
 typedef int (key_cmp)(void const *, void const *);
 
 typedef struct tree_node
 {
-  size_t count;
   struct tree_node * lhs; /* less than */
   struct tree_node * rhs; /* more than */
   char data[];
@@ -41,16 +40,14 @@ typedef struct tree_map
 } tree_map;
 
 /**
- * Initializes a tree map with the specified key comparator and value size. By
- * changing the size of each value, this can be either act like a multiset
- * or a multimap.
+ * Initializes a tree map with the specified key comparator and value size.
  *
  * @param tree - Pointer to an uninitialized tree map
  * @param key_compare - Key relational comparator
  * @param key_size - Size of each key
- * @param value_size - Size of each value, 0 will cause multiset-like behaviour
+ * @param value_size - Size of each value
  *
- * @return true if key_compare or key_size were not NULL
+ * @return true if key_compare is not NULL and key and value sizes are not zero
  */
 bool init_tmap                        (tree_map * const tree,
                                        key_cmp * key_compare,
@@ -76,7 +73,7 @@ void tmap_clear                       (tree_map * const tree);
  *
  * @param tree - Pointer to initialized tree map
  * @param key - Pointer to key
- * @param value - Value: ignored if tree was initialized with 0 value size
+ * @param value - Pointer to Value
  *
  * @returns true if operation succeeded
  */
@@ -90,7 +87,7 @@ bool tmap_put                         (tree_map * restrict const tree,
  *
  * @param tree - Pointer to initialized tree map
  * @param key - Pointer to key
- * @param value - Value: ignored if tree was initialized with 0 value size
+ * @param value - Pointer to Value
  *
  * @returns true if operation succeeded, false if key already exists or
  * memory could not be allocated
@@ -122,42 +119,25 @@ bool tmap_has_key                     (tree_map const * restrict const tree,
                                        void const * restrict key);
 
 /**
- * Checks the number of keys that match of the specified key
+ * Returns a pointer to the value corresponding to the specified key.
  *
  * @param tree - Pointer to initialized tree map
  * @param key - Pointer to key
  *
- * @return the number of matching keys
+ * @return the pointer to the value or NULL
  */
-size_t tmap_count_matches             (tree_map const * restrict const tree,
+void const * tmap_get                 (tree_map const * restrict const tree,
                                        void const * restrict key);
 
 /**
- * Returns the list of values corresponding to the specified key. If tree was
- * initialized with value size of 0, there is no value, and so will always
- * return NULL.
- *
- * @param tree - Pointer to initialized tree map
- * @param key - Pointer to key
- * @param out_matches - Pointer that will be filled with the number of
- *                      matches; ignored if NULL
- *
- * @return the list of values (as this is a multimap) or NULL
- */
-void const * tmap_get                 (tree_map const * restrict const tree,
-                                       void const * restrict key,
-                                       size_t * restrict out_matches);
-
-/**
- * Returns the list of values corresponding to the specified key. If value
- * does not exist because it has not been inserted yet or if tree was
- * initialized with value size of 0, the default value will be returned.
+ * Returns a pointer to the value corresponding to the specified key. If value
+ * does not exist, the default value will be returned.
  *
  * @param tree - Pointer to initialized tree map
  * @param key - Pointer to key
  * @param default_value - Default value
  *
- * @return the list of values (as this is a multimap) or the default value
+ * @return the pointer to the value or the default value
  */
 void const * tmap_get_or_default      (tree_map const * restrict const tree,
                                        void const * key,

@@ -19,36 +19,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-static inline
-size_t calc_value_offset
-(tree_map const * const tree, size_t n)
-{
-  return tree->key_blk + tree->value_blk * n;
-}
-
-static inline
-size_t calc_node_size
-(tree_map const * const tree, size_t n)
-{
-  return sizeof(tree_node) + calc_value_offset(tree, n);
-}
-
 static
 tree_node *create_new_node
 (tree_map const * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* create a blank node */
-  tree_node *new_node = malloc(calc_node_size(tree, 1));
+  tree_node *new_node = malloc(sizeof(tree_node) + tree->key_blk + tree->value_blk);
   if (new_node == NULL) return NULL;
 
-  new_node->count = 1;
   new_node->lhs = NULL;
   new_node->rhs = NULL;
 
   /* copy the key */
   memcpy(new_node->data, key, tree->key_blk);
   /* copy the value */
-  memcpy(new_node->data + calc_value_offset(tree, 0), value, tree->value_blk);
+  memcpy(new_node->data + tree->key_blk, value, tree->value_blk);
 
   return new_node;
 }
@@ -72,7 +57,7 @@ void traversal_inorder
 
   /* visit lhs, data then rhs */
   traversal_inorder(tree, node->lhs, it);
-  it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  it(node->data, node->data + tree->key_blk);
   traversal_inorder(tree, node->rhs, it);
 }
 
@@ -84,7 +69,7 @@ void traversal_inorder_gt
 
   /* visit lhs, data then rhs */
   traversal_inorder_gt(tree, node->lhs, key, it);
-  if (tree->key_compare(key, node->data) < 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  if (tree->key_compare(key, node->data) < 0) it(node->data, node->data + tree->key_blk);
   traversal_inorder_gt(tree, node->rhs, key, it);
 }
 
@@ -96,7 +81,7 @@ void traversal_inorder_lt
 
   /* visit lhs, data then rhs */
   traversal_inorder_lt(tree, node->lhs, key, it);
-  if (tree->key_compare(key, node->data) > 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  if (tree->key_compare(key, node->data) > 0) it(node->data, node->data + tree->key_blk);
   traversal_inorder_lt(tree, node->rhs, key, it);
 }
 
@@ -124,7 +109,7 @@ tree_node ** find_tree_node
 bool init_tmap
 (tree_map * const tree, key_cmp * key_compare, size_t key_size, size_t value_size)
 {
-  if (key_compare == NULL || key_size == 0) return false;
+  if (key_compare == NULL || key_size == 0 || value_size == 0) return false;
 
   tree->len = 0;
   tree->key_blk = key_size;
@@ -156,24 +141,19 @@ bool tmap_put
 (tree_map * restrict const tree, void const * restrict key, void const * restrict value)
 {
   tree_node ** node = find_tree_node(tree, key);
-  if (*node == NULL)
+  if (*node != NULL)
   {
-    tree_node *new_node = create_new_node(tree, key, value);
-    if (new_node == NULL) return false;
-
-    ++tree->len;
-    *node = new_node;
+    /* key already exists, need to update the value */
+    memcpy((*node)->data + tree->key_blk, value, tree->value_blk);
     return true;
   }
 
-  /* resize the current node */
-  tree_node * current = *node;
-  tree_node * resized = tree->value_blk == 0 ? current : realloc(current, calc_node_size(tree, current->count + 1));
-  if (resized == NULL) return false;
+  /* *node == NULL, which means creating a blank node */
+  tree_node *new_node = create_new_node(tree, key, value);
+  if (new_node == NULL) return false;
 
   ++tree->len;
-  memcpy(resized->data + calc_value_offset(tree, resized->count++), value, tree->value_blk);
-  *node = resized;
+  *node = new_node;
   return true;
 }
 
@@ -185,7 +165,6 @@ bool tmap_put_if_absent
   if (*node != NULL) return false;
 
   /* *node == NULL, which means creating a blank node */
-
   tree_node *new_node = create_new_node(tree, key, value);
   if (new_node == NULL) return false;
 
@@ -202,7 +181,7 @@ bool tmap_remove
   if (*node == NULL) return false;
 
   tree_node * current = *node;
-  tree->len -= current->count;
+  --tree->len;
 
   if (current->lhs == NULL)
   {
@@ -270,35 +249,23 @@ bool tmap_remove
 bool tmap_has_key
 (tree_map const * restrict const tree, void const * restrict key)
 {
-  return tmap_count_matches(tree, key) > 0;
-}
-
-size_t tmap_count_matches
-(tree_map const * restrict const tree, void const * restrict key)
-{
-  tree_node ** node = find_tree_node(tree, key);
-  return *node == NULL ? 0 : (*node)->count;
+  return *find_tree_node(tree, key) != NULL;
 }
 
 void const * tmap_get
-(tree_map const * restrict const tree, void const * restrict key, size_t * restrict matches)
+(tree_map const * restrict const tree, void const * restrict key)
 {
   tree_node ** node = find_tree_node(tree, key);
 
-  if (*node == NULL)
-  {
-    if (matches != NULL) *matches = 0;
-    return NULL;
-  }
+  if (*node == NULL) return NULL;
 
-  if (matches != NULL) *matches = (*node)->count;
-  return tree->value_blk > 0 ? (*node)->data + calc_value_offset(tree, 0) : NULL;
+  return (*node)->data + tree->key_blk;
 }
 
 void const * tmap_get_or_default
 (tree_map const * restrict const tree, void const * key, void const * default_value)
 {
-  void const * value = tmap_get(tree, key, NULL);
+  void const * value = tmap_get(tree, key);
   return value == NULL ? default_value : value;
 }
 

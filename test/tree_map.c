@@ -15,7 +15,7 @@ int string_cmp
 
 static
 void default_walker
-(void const * key_slot, size_t matches, void const * values)
+(void const * key_slot, void const * values)
 {
   /* inserting (char const *, int):
    * - key: char const * const *
@@ -23,12 +23,7 @@ void default_walker
    */
   char const * const * key = key_slot;
   int const *ints = values;
-  printf("%s(%zu): ", *key, matches);
-  for (size_t i = 0; i < matches; ++i)
-  {
-    printf("%d ", ints[i]);
-  }
-  puts("");
+  printf("%s: %d\n", *key, *ints);
 }
 
 int main
@@ -75,10 +70,10 @@ int main
   printf("Tree has 'Gamma'?: %d\n", tmap_has_key(&tree, &str));
 
   str = "Alpha";
-  printf("Tree has %zu 'Alpha's\n", tmap_count_matches(&tree, &str));
+  printf("Tree has 'Alpha'?: %d\n", tmap_has_key(&tree, &str));
 
   str = "Foo";
-  printf("Tree has %zu 'Foo's\n\n", tmap_count_matches(&tree, &str));
+  printf("Tree has 'Foo'?: %d\n\n", tmap_has_key(&tree, &str));
 
   str = "Alpha";
   tmap_remove(&tree, &str);
@@ -96,7 +91,7 @@ int main
   printf("Tree size: %zu\n\n", tmap_size(&tree));
 
   str = "Beta";
-  printf("Beta --> %d\n", *(int const *) tmap_get(&tree, &str, NULL));
+  printf("Beta --> %d\n", *(int const *) tmap_get(&tree, &str));
 
   str = "a";
   printf("\nThings lesser than \"a\":\n");

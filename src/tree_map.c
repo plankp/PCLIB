@@ -14,28 +14,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "binary_tree.h"
+#include "tree_map.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 static inline
 size_t calc_value_offset
-(binary_tree const * const tree, size_t n)
+(tree_map const * const tree, size_t n)
 {
   return tree->key_blk + tree->value_blk * n;
 }
 
 static inline
 size_t calc_node_size
-(binary_tree const * const tree, size_t n)
+(tree_map const * const tree, size_t n)
 {
   return sizeof(tree_node) + calc_value_offset(tree, n);
 }
 
 static
 tree_node *create_new_node
-(binary_tree const * restrict const tree, void const * restrict key, void const * restrict value)
+(tree_map const * restrict const tree, void const * restrict key, void const * restrict value)
 {
   /* create a blank node */
   tree_node *new_node = malloc(calc_node_size(tree, 1));
@@ -66,7 +66,7 @@ void free_subsequent_nodes
 
 static
 void traversal_inorder
-(binary_tree const * restrict const tree, tree_node const * node, bintree_it * it)
+(tree_map const * restrict const tree, tree_node const * node, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -78,7 +78,7 @@ void traversal_inorder
 
 static
 void traversal_inorder_gt
-(binary_tree const * restrict const tree, tree_node const * node, void const * const restrict key, bintree_it * it)
+(tree_map const * restrict const tree, tree_node const * node, void const * const restrict key, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -90,7 +90,7 @@ void traversal_inorder_gt
 
 static
 void traversal_inorder_lt
-(binary_tree const * restrict const tree, tree_node const * node, void const * const restrict key, bintree_it * it)
+(tree_map const * restrict const tree, tree_node const * node, void const * const restrict key, tmap_it * it)
 {
   if (node == NULL) return;
 
@@ -102,7 +102,7 @@ void traversal_inorder_lt
 
 static
 tree_node ** find_tree_node
-(binary_tree const * restrict const tree, void const * restrict const key)
+(tree_map const * restrict const tree, void const * restrict const key)
 {
   /* this is more like a multimap meaning you can have
    * multiple nodes with the same key (compare --> 0)
@@ -121,8 +121,8 @@ tree_node ** find_tree_node
   return (tree_node **) node;
 }
 
-bool init_bintree
-(binary_tree * const tree, key_cmp * key_compare, size_t key_size, size_t value_size)
+bool init_tmap
+(tree_map * const tree, key_cmp * key_compare, size_t key_size, size_t value_size)
 {
   if (key_compare == NULL || key_size == 0) return false;
 
@@ -134,14 +134,14 @@ bool init_bintree
   return true;
 }
 
-void free_bintree
-(binary_tree * const tree)
+void free_tmap
+(tree_map * const tree)
 {
-  bintree_clear(tree);
+  tmap_clear(tree);
 }
 
-void bintree_clear
-(binary_tree * const tree)
+void tmap_clear
+(tree_map * const tree)
 {
   if (tree->len > 0)
   {
@@ -152,8 +152,8 @@ void bintree_clear
   }
 }
 
-bool bintree_put
-(binary_tree * restrict const tree, void const * restrict key, void const * restrict value)
+bool tmap_put
+(tree_map * restrict const tree, void const * restrict key, void const * restrict value)
 {
   tree_node ** node = find_tree_node(tree, key);
   if (*node == NULL)
@@ -177,8 +177,8 @@ bool bintree_put
   return true;
 }
 
-bool bintree_put_if_absent
-(binary_tree * restrict const tree, void const * restrict key, void const * restrict value)
+bool tmap_put_if_absent
+(tree_map * restrict const tree, void const * restrict key, void const * restrict value)
 {
   tree_node ** node = find_tree_node(tree, key);
 
@@ -194,8 +194,8 @@ bool bintree_put_if_absent
   return true;
 }
 
-bool bintree_remove
-(binary_tree * restrict const tree, void const * restrict key)
+bool tmap_remove
+(tree_map * restrict const tree, void const * restrict key)
 {
   tree_node ** node = find_tree_node(tree, key);
 
@@ -267,21 +267,21 @@ bool bintree_remove
   return true;
 }
 
-bool bintree_has_key
-(binary_tree const * restrict const tree, void const * restrict key)
+bool tmap_has_key
+(tree_map const * restrict const tree, void const * restrict key)
 {
-  return bintree_count_matches(tree, key) > 0;
+  return tmap_count_matches(tree, key) > 0;
 }
 
-size_t bintree_count_matches
-(binary_tree const * restrict const tree, void const * restrict key)
+size_t tmap_count_matches
+(tree_map const * restrict const tree, void const * restrict key)
 {
   tree_node ** node = find_tree_node(tree, key);
   return *node == NULL ? 0 : (*node)->count;
 }
 
-void const * bintree_get
-(binary_tree const * restrict const tree, void const * restrict key, size_t * restrict matches)
+void const * tmap_get
+(tree_map const * restrict const tree, void const * restrict key, size_t * restrict matches)
 {
   tree_node ** node = find_tree_node(tree, key);
 
@@ -295,33 +295,33 @@ void const * bintree_get
   return tree->value_blk > 0 ? (*node)->data + calc_value_offset(tree, 0) : NULL;
 }
 
-void const * bintree_get_or_default
-(binary_tree const * restrict const tree, void const * key, void const * default_value)
+void const * tmap_get_or_default
+(tree_map const * restrict const tree, void const * key, void const * default_value)
 {
-  void const * value = bintree_get(tree, key, NULL);
+  void const * value = tmap_get(tree, key, NULL);
   return value == NULL ? default_value : value;
 }
 
-void bintree_foreach
-(binary_tree const * const tree, bintree_it * it)
+void tmap_foreach
+(tree_map const * const tree, tmap_it * it)
 {
   traversal_inorder(tree, tree->root, it);
 }
 
-void bintree_foreach_gt
-(binary_tree const * restrict const tree, void const * restrict key, bintree_it * it)
+void tmap_foreach_gt
+(tree_map const * restrict const tree, void const * restrict key, tmap_it * it)
 {
   traversal_inorder_gt(tree, tree->root, key, it);
 }
 
-void bintree_foreach_lt
-(binary_tree const * restrict const tree, void const * restrict key, bintree_it * it)
+void tmap_foreach_lt
+(tree_map const * restrict const tree, void const * restrict key, tmap_it * it)
 {
   traversal_inorder_lt(tree, tree->root, key, it);
 }
 
-size_t bintree_size
-(binary_tree const * const tree)
+size_t tmap_size
+(tree_map const * const tree)
 {
   return tree->len;
 }

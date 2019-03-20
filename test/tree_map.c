@@ -1,4 +1,4 @@
-#include "binary_tree.h"
+#include "tree_map.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -34,8 +34,8 @@ void default_walker
 int main
 (int argc, char **argv)
 {
-  binary_tree tree;
-  init_bintree(&tree, &string_cmp, sizeof(char const *), sizeof(int));
+  tree_map tree;
+  init_tmap(&tree, &string_cmp, sizeof(char const *), sizeof(int));
 
   static char const * const test_data[] =
   {
@@ -58,52 +58,52 @@ int main
 
   for (size_t i = 0; i < sizeof(test_data) / sizeof(char const *); ++i)
   {
-    bintree_put(&tree, &test_data[i], &i);
+    tmap_put(&tree, &test_data[i], &i);
   }
 
   int tmp = 100;
   char const * str = "Beta";
-  bintree_put_if_absent(&tree, &str, &tmp);
+  tmap_put_if_absent(&tree, &str, &tmp);
 
   tmp = 101;
-  bintree_put_if_absent(&tree, &str, &tmp);
+  tmap_put_if_absent(&tree, &str, &tmp);
 
-  bintree_foreach(&tree, &default_walker);
-  printf("Tree size: %zu\n\n", bintree_size(&tree));
+  tmap_foreach(&tree, &default_walker);
+  printf("Tree size: %zu\n\n", tmap_size(&tree));
 
   str = "Gamma";
-  printf("Tree has 'Gamma'?: %d\n", bintree_has_key(&tree, &str));
+  printf("Tree has 'Gamma'?: %d\n", tmap_has_key(&tree, &str));
 
   str = "Alpha";
-  printf("Tree has %zu 'Alpha's\n", bintree_count_matches(&tree, &str));
+  printf("Tree has %zu 'Alpha's\n", tmap_count_matches(&tree, &str));
 
   str = "Foo";
-  printf("Tree has %zu 'Foo's\n\n", bintree_count_matches(&tree, &str));
+  printf("Tree has %zu 'Foo's\n\n", tmap_count_matches(&tree, &str));
 
   str = "Alpha";
-  bintree_remove(&tree, &str);
-  bintree_foreach(&tree, &default_walker);
-  printf("Tree size: %zu\n\n", bintree_size(&tree));
+  tmap_remove(&tree, &str);
+  tmap_foreach(&tree, &default_walker);
+  printf("Tree size: %zu\n\n", tmap_size(&tree));
 
   str = "PzrhlPLqET";
-  bintree_remove(&tree, &str);
-  bintree_foreach(&tree, &default_walker);
-  printf("Tree size: %zu\n\n", bintree_size(&tree));
+  tmap_remove(&tree, &str);
+  tmap_foreach(&tree, &default_walker);
+  printf("Tree size: %zu\n\n", tmap_size(&tree));
 
   str = "rYxhygHpTi";
-  bintree_remove(&tree, &str);
-  bintree_foreach(&tree, &default_walker);
-  printf("Tree size: %zu\n\n", bintree_size(&tree));
+  tmap_remove(&tree, &str);
+  tmap_foreach(&tree, &default_walker);
+  printf("Tree size: %zu\n\n", tmap_size(&tree));
 
   str = "Beta";
-  printf("Beta --> %d\n", *(int const *) bintree_get(&tree, &str, NULL));
+  printf("Beta --> %d\n", *(int const *) tmap_get(&tree, &str, NULL));
 
   str = "a";
   printf("\nThings lesser than \"a\":\n");
-  bintree_foreach_lt(&tree, &str, &default_walker);
+  tmap_foreach_lt(&tree, &str, &default_walker);
   printf("\nThings greater than \"a\":\n");
-  bintree_foreach_gt(&tree, &str, &default_walker);
+  tmap_foreach_gt(&tree, &str, &default_walker);
 
-  free_bintree(&tree);
+  free_tmap(&tree);
   return 0;
 }

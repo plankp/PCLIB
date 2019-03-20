@@ -54,6 +54,13 @@ int main
     "Alpha",
     "Gamma",
     "Zeta",
+
+    "Remove this",
+    "Remove this",
+    "Remove this",
+    "Remove this",
+    "Remove this",
+    "Remove this",
   };
 
   for (size_t i = 0; i < sizeof(test_data) / sizeof(char const *); ++i)
@@ -79,6 +86,16 @@ int main
 
   str = "Foo";
   printf("Tree has %zu 'Foo's\n\n", tmmap_count_matches(&tree, &str));
+
+  str = "Remove this";
+  printf("Tree has %zu 'Remove this's\n", tmmap_count_matches(&tree, &str));
+  tmmap_remove_values(&tree, &str, 1, 3);
+  printf("Tree has %zu 'Remove this's\n", tmmap_count_matches(&tree, &str));
+  tmp = 100;
+  tmmap_put(&tree, &str, &tmp);
+  printf("Tree has %zu 'Remove this's\n", tmmap_count_matches(&tree, &str));
+  tmmap_remove_values(&tree, &str, 0, 100);
+  printf("Tree has %zu 'Remove this's\n\n", tmmap_count_matches(&tree, &str));
 
   str = "Alpha";
   tmmap_remove(&tree, &str);

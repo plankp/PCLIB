@@ -203,15 +203,11 @@ bool tmmap_put_if_absent
   return true;
 }
 
-bool tmmap_remove
-(tree_multimap * restrict const tree, void const * restrict key)
+static
+void remove_node
+(tmmap_node ** node)
 {
-  tmmap_node ** node = find_tree_node(tree, key);
-
-  if (*node == NULL) return false;
-
   tmmap_node * current = *node;
-  tree->len -= current->count;
 
   if (current->lhs == NULL)
   {
@@ -220,7 +216,7 @@ bool tmmap_remove
     /* make sure the pulled rhs does not get freed */
     current->rhs = NULL;
     free_subsequent_nodes(current);
-    return true;
+    return;
   }
 
   if (current->rhs == NULL)
@@ -230,7 +226,7 @@ bool tmmap_remove
     /* make sure the pulled lhs does not get freed */
     current->lhs = NULL;
     free_subsequent_nodes(current);
-    return true;
+    return;
   }
 
   /* node contains both children: pull up the minimum node of rhs */
@@ -272,8 +268,52 @@ bool tmmap_remove
   current->lhs = NULL;
   current->rhs = NULL;
   free_subsequent_nodes(current);
+}
 
+bool tmmap_remove
+(tree_multimap * restrict const tree, void const * restrict key)
+{
+  tmmap_node ** node = find_tree_node(tree, key);
+  if (*node == NULL) return false;
+
+  tree->len -= (*node)->count;
+  remove_node(node);
   return true;
+}
+
+size_t tmmap_remove_values
+(tree_multimap * restrict const tree, void const * restrict key, size_t lo, size_t hi)
+{
+  if (lo >= hi) return 0; /* do nothing since range is [lo, hi) */
+
+  tmmap_node ** node = find_tree_node(tree, key);
+  if (*node == NULL) return 0; /* actual amount of occurrences is 0 */
+
+  tmmap_node * current = *node;
+  /* only remove up to *count* if upper bound is out of range */
+  size_t const max_len = current->count;
+  size_t const max_idx = max_len < hi ? max_len : hi;
+
+  /* if the lower bound is out of range, then this method does nothing */
+  if (lo >= max_len) return 0;
+
+  if (max_idx == max_len && lo == 0)
+  {
+    /* removing all values, just remove the node directly */
+    tree->len -= max_len;
+    remove_node(node);
+    return max_len;
+  }
+
+  /* remove the values associated with the range */
+  memmove(
+    current->data + calc_value_offset(tree, lo),
+    current->data + calc_value_offset(tree, max_idx),
+    (max_len - max_idx) * tree->value_blk);
+  size_t const delta = max_idx - lo;
+  current->count -= delta;
+  tree->len -= delta;
+  return delta;
 }
 
 bool tmmap_has_key

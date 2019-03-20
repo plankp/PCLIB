@@ -123,6 +123,24 @@ bool tmmap_remove                     (tree_multimap * restrict const tree,
                                        void const * restrict key);
 
 /**
+ * Removes a range of values associated with the key. If the upper bound of
+ * the range is more than the amount of values associated, it only removes up
+ * until the last associated value. If the range covers all or more than all
+ * values, then the key is removed from the map.
+ *
+ * @param tree - Pointer to initialized tree map
+ * @param key - Pointer to key
+ * @param lo - Lower bound of the removal range
+ * @param hi - Upper bound of the removal range
+ *
+ * @return the actual amount of values removed
+ */
+size_t tmmap_remove_values            (tree_multimap * restrict const tree,
+                                       void const * restrict key,
+                                       size_t lo,
+                                       size_t hi);
+
+/**
  * Checks if specified key exists
  *
  * @param tree - Pointer to initialized tree map

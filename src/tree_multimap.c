@@ -72,7 +72,7 @@ void traversal_inorder
 
   /* visit lhs, data then rhs */
   traversal_inorder(tree, node->lhs, it);
-  it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  it(node->data, node->count, node->data + calc_value_offset(tree, 0));
   traversal_inorder(tree, node->rhs, it);
 }
 
@@ -84,7 +84,7 @@ void traversal_inorder_gt
 
   /* visit lhs, data then rhs */
   traversal_inorder_gt(tree, node->lhs, key, it);
-  if (tree->key_compare(key, node->data) < 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  if (tree->key_compare(key, node->data) < 0) it(node->data, node->count, node->data + calc_value_offset(tree, 0));
   traversal_inorder_gt(tree, node->rhs, key, it);
 }
 
@@ -96,7 +96,7 @@ void traversal_inorder_lt
 
   /* visit lhs, data then rhs */
   traversal_inorder_lt(tree, node->lhs, key, it);
-  if (tree->key_compare(key, node->data) > 0) it(node->data, node->count, tree->value_blk > 0 ? node->data + calc_value_offset(tree, 0) : NULL);
+  if (tree->key_compare(key, node->data) > 0) it(node->data, node->count, node->data + calc_value_offset(tree, 0));
   traversal_inorder_lt(tree, node->rhs, key, it);
 }
 
@@ -168,7 +168,7 @@ bool tmmap_put
 
   /* resize the current node */
   tmmap_node * current = *node;
-  tmmap_node * resized = tree->value_blk == 0 ? current : realloc(current, calc_node_size(tree, current->count + 1));
+  tmmap_node * resized = realloc(current, calc_node_size(tree, current->count + 1));
   if (resized == NULL) return false;
 
   ++tree->len;
@@ -292,7 +292,7 @@ void const * tmmap_get
   }
 
   if (matches != NULL) *matches = (*node)->count;
-  return tree->value_blk > 0 ? (*node)->data + calc_value_offset(tree, 0) : NULL;
+  return (*node)->data + calc_value_offset(tree, 0);
 }
 
 void const * tmmap_get_or_default

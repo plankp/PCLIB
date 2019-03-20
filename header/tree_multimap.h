@@ -14,122 +14,153 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BINARY_TREE_H__
-#define __BINARY_TREE_H__
+#ifndef __TREE_MULTIMAP_H__
+#define __TREE_MULTIMAP_H__
 
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef void (bintree_it)(void const *, size_t, void const *);
+/**
+ * The growth function for each node of the multimap.
+ *
+ * By default, the capacity is unscaled (no elements are preallocated)
+ *
+ * @param n - The precomputed new capacity
+ *
+ * @return value >= n
+ */
+#ifndef TMMAP_GROW /* (size_t n) */
+#define TMMAP_GROW(n) (n)
+#endif
+
+typedef void (tmmap_it)(void const *, size_t, void const *);
 typedef int (key_cmp)(void const *, void const *);
 
-typedef struct tree_node
+typedef struct tmmap_node
 {
   size_t count;
-  struct tree_node * lhs; /* less than */
-  struct tree_node * rhs; /* more than */
+  size_t cap;
+  struct tmmap_node * lhs; /* less than */
+  struct tmmap_node * rhs; /* more than */
   char data[];
-} tree_node;
+} tmmap_node;
 
-typedef struct binary_tree
+typedef struct tree_multimap
 {
   size_t len;
   size_t key_blk;
   size_t value_blk;
-  tree_node * root;
+  tmmap_node * root;
   key_cmp * key_compare;
-} binary_tree;
+} tree_multimap;
 
 /**
- * Initializes a binary tree with the specified key comparator and value size.
- * By changing the size of each value, this can be either act like a multiset
- * or a multimap.
+ * Initializes a tree multimap with the specified key comparator and value
+ * size.
  *
- * @param tree - Pointer to an uninitialized binary tree
+ * @param tree - Pointer to an uninitialized tree multimap
  * @param key_compare - Key relational comparator
  * @param key_size - Size of each key
- * @param value_size - Size of each value, 0 will cause multiset-like behaviour
+ * @param value_size - Size of each value
  *
- * @return true if key_compare or key_size were not NULL
+ * @return true if key_compare is not NULL and key and value sizes are not zero
  */
-bool init_bintree                     (binary_tree * const tree,
+bool init_tmmap                       (tree_multimap * const tree,
                                        key_cmp * key_compare,
                                        size_t key_size,
                                        size_t value_size);
 
 /**
- * Frees a binary tree, making it the same as uninitialized.
+ * Frees a tree multimap, making it the same as uninitialized.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  */
-void free_bintree                     (binary_tree * const tree);
+void free_tmmap                       (tree_multimap * const tree);
 
 /**
- * Clears a binary tree by deallocating all nodes and setting size to zero.
+ * Clears a tree multimap by deallocating all nodes and setting size to zero.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  */
-void bintree_clear                    (binary_tree * const tree);
+void tmmap_clear                      (tree_multimap * const tree);
 
 /**
  * Puts a key with corresponding value into the tree.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
  * @returns true if operation succeeded
  */
-bool bintree_put                      (binary_tree * restrict const tree,
+bool tmmap_put                        (tree_multimap * restrict const tree,
                                        void const * restrict key,
                                        void const * restrict value);
 
 /**
- * Puts a key with corresponding value into the tree only if key does not exist
- * in the tree. If such key already exists, false is returned
+ * Puts a key with corresponding value into the tree only if key does not
+ * exist in the tree. If such key already exists, false is returned
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param value - Value: ignored if tree was initialized with 0 value size
  *
  * @returns true if operation succeeded, false if key already exists or
  * memory could not be allocated
  */
-bool bintree_put_if_absent            (binary_tree * restrict const tree,
+bool tmmap_put_if_absent              (tree_multimap * restrict const tree,
                                        void const * restrict key,
                                        void const * restrict value);
 
 /**
  * Removes a key along with its values
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return true if such a key was found and removed
  */
-bool bintree_remove                   (binary_tree * restrict const tree,
+bool tmmap_remove                     (tree_multimap * restrict const tree,
                                        void const * restrict key);
+
+/**
+ * Removes a range of values associated with the key. If the upper bound of
+ * the range is more than the amount of values associated, it only removes up
+ * until the last associated value. If the range covers all or more than all
+ * values, then the key is removed from the multimap.
+ *
+ * @param tree - Pointer to initialized tree multimap
+ * @param key - Pointer to key
+ * @param lo - Lower bound of the removal range
+ * @param hi - Upper bound of the removal range
+ *
+ * @return the actual amount of values removed
+ */
+size_t tmmap_remove_values            (tree_multimap * restrict const tree,
+                                       void const * restrict key,
+                                       size_t lo,
+                                       size_t hi);
 
 /**
  * Checks if specified key exists
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return true if such a key exists, false otherwise
  */
-bool bintree_has_key                  (binary_tree const * restrict const tree,
+bool tmmap_has_key                    (tree_multimap const * restrict const tree,
                                        void const * restrict key);
 
 /**
  * Checks the number of keys that match of the specified key
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  *
  * @return the number of matching keys
  */
-size_t bintree_count_matches          (binary_tree const * restrict const tree,
+size_t tmmap_count_matches            (tree_multimap const * restrict const tree,
                                        void const * restrict key);
 
 /**
@@ -137,13 +168,14 @@ size_t bintree_count_matches          (binary_tree const * restrict const tree,
  * initialized with value size of 0, there is no value, and so will always
  * return NULL.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
- * @param out_matches - Pointer that will be filled with the number of matches; ignored if NULL
+ * @param out_matches - Pointer that will be filled with the number of
+ *                      matches; ignored if NULL
  *
  * @return the list of values (as this is a multimap) or NULL
  */
-void const * bintree_get              (binary_tree const * restrict const tree,
+void const* tmmap_get                 (tree_multimap const * restrict const tree,
                                        void const * restrict key,
                                        size_t * restrict out_matches);
 
@@ -152,13 +184,13 @@ void const * bintree_get              (binary_tree const * restrict const tree,
  * does not exist because it has not been inserted yet or if tree was
  * initialized with value size of 0, the default value will be returned.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param key - Pointer to key
  * @param default_value - Default value
  *
  * @return the list of values (as this is a multimap) or the default value
  */
-void const * bintree_get_or_default   (binary_tree const * restrict const tree,
+void const* tmmap_get_or_default      (tree_multimap const * restrict const tree,
                                        void const * key,
                                        void const * default_value);
 
@@ -166,45 +198,45 @@ void const * bintree_get_or_default   (binary_tree const * restrict const tree,
  * Iterates through every key-value entry of the tree. The state of the tree
  * should be kept consistent during the iteration process.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  */
-void bintree_foreach                  (binary_tree const * const tree,
-                                       bintree_it * it);
+void tmmap_foreach                    (tree_multimap const * const tree,
+                                       tmmap_it * it);
 
 /**
  * Iterates through every key-value entry of the tree that is greater than the
  * specified key. The state of the tree should be kept consistent during the
  * iteration process.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void bintree_foreach_gt               (binary_tree const * restrict const tree,
+void tmmap_foreach_gt                 (tree_multimap const * restrict const tree,
                                        void const * restrict key,
-                                       bintree_it * it);
+                                       tmmap_it * it);
 
 /**
  * Iterates through every key-value entry of the tree that is lesser than the
  * specified key. The state of the tree should be kept consistent during the
  * iteration process.
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void bintree_foreach_lt               (binary_tree const * restrict const tree,
+void tmmap_foreach_lt                 (tree_multimap const * restrict const tree,
                                        void const * restrict key,
-                                       bintree_it * it);
+                                       tmmap_it * it);
 
 /**
- * Returns the size of the binary tree
+ * Returns the size of the tree multimap
  *
- * @param tree - Pointer to initialized binary tree
+ * @param tree - Pointer to initialized tree multimap
  *
- * @return size of the binary tree
+ * @return size of the tree multimap
  */
-size_t bintree_size                   (binary_tree const * const tree);
+size_t tmmap_size                     (tree_multimap const * const tree);
 
 #endif

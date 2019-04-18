@@ -2,31 +2,32 @@
 
 #include <stdio.h>
 
-CLOSURE_GENERATE(t5, int, int, int p)
+static
+void *counter(closure *self, size_t sz, void *argv)
 {
-	return p * *self;
+  int *data = closure_get_data(self);
+  ++(*data);
+  return data;
 }
 
-SUPPLIER_GENERATE(sint, size_t, size_t)
-{
-	return (*self)++;
-}
 
-int
-main (void)
+int main
+(int argc, char ** argv)
 {
-	CLOSURE_TYPE(t5) clos = CLOSURE_INIT(t5, 5);
-	printf("5 * (1, 2, 3) = (%d, %d, %d)\n",
-			GENERIC_CALL(&clos, 1),
-			GENERIC_CALL(&clos, 2),
-			GENERIC_CALL(&clos, 3));
+  closure *clos_a = new_closure(&counter, sizeof(int));
+  closure *clos_b = new_closure(&counter, sizeof(int));
 
-	SUPPLIER_TYPE(sint) sint = SUPPLIER_INIT(sint, 0);
-	size_t i;
-	for (i = 0; i < 10; ++i)
-	{
-		printf("%zu ", GENERIC_CALL(&sint));
-	}
-	printf("\n");
-	return 0;
+  closure_apply(clos_a, 0, NULL);
+  closure_apply(clos_a, 0, NULL);
+  int *ret_a = closure_apply(clos_a, 0, NULL);
+  /* a's data should be 3 */
+
+  int *ret_b = closure_apply(clos_b, 0, NULL);
+  /* b's data should be 1 */
+
+  printf("clos a: %d\n", *ret_a);
+  printf("clos b: %d\n", *ret_b);
+
+  delete_closure(clos_a);
+  delete_closure(clos_b);
 }

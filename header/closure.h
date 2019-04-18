@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2016 Paul Teng
+ * Copyright (c) 2019 Paul Teng
  * 
  * PCLIB is free software: you can redistribute it and/or modify  
  * it under the terms of the GNU Lesser General Public License as   
@@ -17,164 +17,56 @@
 #ifndef __CLOSURE_H__
 #define __CLOSURE_H__
 
-/**
- * Base macro for generating all other function generating related macros
- *
- * Note: You should not call this macro directly since it will not be
- * compatible with all the other macros (except for GENERIC_CALL)
- */
-#define RAW_CLOSURE_GENERATE(id, B, R, ...) \
-	struct id##_closure_t \
-	{ \
-		R (*fptr)(B*, ##__VA_ARGS__); \
-		B block; \
-	}; \
- \
-	static inline R __##id##_closure_func(B*, ##__VA_ARGS__); \
- \
-	struct id##_closure_t \
-	init_##id##_closure(B block) \
-	{ \
-		return (struct id##_closure_t) { \
-			.fptr=&__##id##_closure_func, \
-			.block=block \
-		}; \
-	} \
- \
-	static inline \
-	R \
-	__##id##_closure_func(B *self, ##__VA_ARGS__)
+#include <stddef.h>
+#include <stdbool.h>
 
-// ----- Generators -----
+typedef struct closure closure;
 
 /**
- * Generates a closure. The name closure is a bit misleading
- * since it cannot be mixed with the other closure types.
+ * Constructs a new closure object with the specified behaviour and data space.
+ * Data space, if applicable, is zeroed out during this call.
  *
- * @param id An unique name for the closure
- * @param B Block type. Typically a struct containing all
- * the captured variables. Referenced as self in the closure.
- * @param R Return type of the closure
- * @param ... The parameters
+ * @param fptr - Behaviour of the closure when being applied/invoked
+ * @param data_size - Size of the data space, 0 if no data space is needed
  *
- * @body The body of the closure is immediately supplied
- * after this call.
+ * @return NULL if closure object cannot be allocated
  */
-#define CLOSURE_GENERATE(id, B, R, ...) \
-		RAW_CLOSURE_GENERATE(clos_##id, B, R, ##__VA_ARGS__)
+closure *new_closure(void *(*fptr)(closure *, size_t, void *), size_t data_size);
 
 /**
- * Generates a consumer (a non-compatible void returning
- * closure)
+ * Destroys a closure object
  *
- * @param id An unique name for the closure
- * @param B Block type. Typically a struct containing all
- * the captured variables. Referenced as self in the closure.
- * @param ... The parameters
- *
- * @body The body of the closure is immediately supplied
- * after this call.
+ * @param clos - Closure object being destroyed
  */
-#define CONSUMER_GENERATE(id, B, ...) \
-		RAW_CLOSURE_GENERATE(cons_##id, B, void, ##__VA_ARGS__)
+void delete_closure(closure *clos);
 
 /**
- * Generates a predicate (a non-compatible boolean returning
- * closure)
+ * Copies data into data space of closure object
  *
- * @param id An unique name for the closure
- * @param B Block type. Typically a struct containing all
- * the captured variables. Referenced as self in the closure.
- * @param ... The parameters
- *
- * @body The body of the closure is immediately supplied
- * after this call.
+ * @param clos - Closure object whos data space is being changed
+ * @param buf - Source of data
+ * @param data_size - Number of bytes to copy
  */
-#define PREDICATE_GENERATE(id, B, ...) \
-		RAW_CLOSURE_GENERATE(pred_##id, B, _Bool, ##__VA_ARGS__)
+void closure_set_data(closure *restrict clos, const void *restrict buf, size_t data_size);
 
 /**
- * Generates a supplier (a non-compatible closure that takes
- * no parameters)
+ * Retrieves the pointer to the head of the data space
  *
- * @param id An unique name for the closure
- * @param B Block type. Typically a struct containing all
- * the captured variables. Referenced as self in the closure.
- * @param R Return type of the closure
+ * @param clos - Closure object whos data space is being retrieved
  *
- * @body The body of the closure is immediately supplied
- * after this call.
+ * @return data space of the closure
  */
-#define SUPPLIER_GENERATE(id, B, R) \
-		RAW_CLOSURE_GENERATE(supp_##id, B, R)
-
-// ----- Typedef-ish -----
+void *closure_get_data(closure *clos);
 
 /**
- * Returns the type of the closure (not raw_closure)
- * associated with the id
+ * Applies/invokes the closure object by performing the behaviour defined.
  *
- * @param id The unique name for the closure
+ * @param clos - Closure object being applied/invoked
+ * @param sz - Number of bytes of argument buffer
+ * @param argv - The argument buffer
  *
- * @returns The expanded name
+ * @return result of the behaviour tied to the closure
  */
-#define CLOSURE_TYPE(id) struct clos_##id##_closure_t
-
-/**
- * Returns the type of the consumer associated with
- * the id
- *
- * @param id The unique name for the consumer
- *
- * @returns The expanded name
- */
-#define CONSUMER_TYPE(id) struct cons_##id##_closure_t
-
-/**
- * Returns the type of the predicate associated
- * with the id
- *
- * @param id The unique name for the predicate
- *
- * @returns The expanded name
- */
-#define PREDICATE_TYPE(id) struct pred_##id##_closure_t
-
-/**
- * Returns the type of the supplier associated
- * with the id
- *
- * @param id The unique name for the supplier
- *
- * @returns The expanded name
- */
-#define SUPPLIER_TYPE(id) struct supp_##id##_closure_t
-
-// ----- Initializers -----
-
-#define CLOSURE_INIT(id, block) (init_clos_##id##_closure(block))
-
-#define CONSUMER_INIT(id, block) (init_cons_##id##_closure(block))
-
-#define PREDICATE_INIT(id, block) (init_pred_##id##_closure(block))
-
-#define SUPPLIER_INIT(id, block) (init_supp_##id##_closure(block))
-
-// ----- Apply -----
-
-/**
- * Performs a call for any raw closure derived
- * closure
- *
- * @param self The raw closure
- * @param ... The parameters for the closure. Do
- * not pass anything in if the closure is a
- * supplier.
- *
- * @returns The result of the closure call.
- * Consumers will always return void.
- *
- */
-#define GENERIC_CALL(self, ...) ((self)->fptr(&(self)->block, ##__VA_ARGS__))
+void *closure_apply(closure *clos, size_t sz, void *argv);
 
 #endif

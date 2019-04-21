@@ -1,13 +1,13 @@
-/* 
+/*
  * Copyright (c) 2019 Paul Teng
- * 
- * PCLIB is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU Lesser General Public License as   
+ *
+ * PCLIB is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, version 3.
  *
- * PCLIB is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * PCLIB is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -31,14 +31,15 @@ typedef struct closure closure;
  *
  * @return NULL if closure object cannot be allocated
  */
-closure *new_closure(void *(*fptr)(closure *, size_t, void *), size_t data_size);
+closure *new_closure      (void *(*fptr)(closure *, size_t, void *),
+                           size_t data_size);
 
 /**
  * Destroys a closure object
  *
  * @param clos - Closure object being destroyed
  */
-void delete_closure(closure *clos);
+void delete_closure       (closure *clos);
 
 /**
  * Copies data into data space of closure object
@@ -47,7 +48,9 @@ void delete_closure(closure *clos);
  * @param buf - Source of data
  * @param data_size - Number of bytes to copy
  */
-void closure_set_data(closure *restrict clos, const void *restrict buf, size_t data_size);
+void closure_set_data     (closure *restrict clos,
+                           const void *restrict buf,
+                           size_t data_size);
 
 /**
  * Retrieves the pointer to the head of the data space
@@ -56,7 +59,7 @@ void closure_set_data(closure *restrict clos, const void *restrict buf, size_t d
  *
  * @return data space of the closure
  */
-void *closure_get_data(closure *clos);
+void *closure_get_data    (closure *clos);
 
 /**
  * Applies/invokes the closure object by performing the behaviour defined.
@@ -67,6 +70,8 @@ void *closure_get_data(closure *clos);
  *
  * @return result of the behaviour tied to the closure
  */
-void *closure_apply(closure *clos, size_t sz, void *argv);
+void *closure_apply     (closure *clos,
+                         size_t sz,
+                         void *argv);
 
 #endif

@@ -47,22 +47,22 @@
 #define HMAP_PROBE(h, k) ((h) + (k))
 #endif
 
-typedef unsigned long (hash_func)(void const *);
-typedef bool (key_eq)(void const *, void const *);
+typedef unsigned long (hash_func)(const void *);
+typedef bool (key_eq)(const void *, const void *);
 
 typedef struct map_entry
 {
   unsigned long hash;
-  void const * pair;
+  const void *pair;
 } map_entry;
 
 typedef struct hash_map
 {
   size_t len;
   size_t cap;
-  map_entry * mem;
-  hash_func * hasher;
-  key_eq * key_equal;
+  map_entry *mem;
+  hash_func *hasher;
+  key_eq *key_equal;
 } hash_map;
 
 /**
@@ -74,16 +74,16 @@ typedef struct hash_map
  *
  * @return true if hasher and key_equal were not NULL
  */
-bool init_hmap                    (hash_map * const map,
-                                   hash_func * hasher,
-                                   key_eq * key_equal);
+bool init_hmap                      (hash_map *map,
+                                     hash_func *hasher,
+                                     key_eq *key_equal);
 
 /**
  * Frees a hash map, making it the same as uninitialized.
  *
  * @param map - Pointer to initialized hash map
  */
-void free_hmap                    (hash_map * const map);
+void free_hmap                      (hash_map *map);
 
 /**
  * Clears the hash map by marking the buckets as unoccupied. The size is set
@@ -91,7 +91,7 @@ void free_hmap                    (hash_map * const map);
  *
  * @param map - Pointer to initialized hash map
  */
-void hmap_clear                   (hash_map * const map);
+void hmap_clear                     (hash_map *map);
 
 /**
  * Ensures the capacity is at least n.
@@ -102,7 +102,8 @@ void hmap_clear                   (hash_map * const map);
  * @return true if capacity was already at least n or buckets were able to be
  * allocated successfully
  */
-bool hmap_ensure_capacity         (hash_map * const map, size_t n);
+bool hmap_ensure_capacity           (hash_map *map,
+                                     size_t n);
 
 /**
  * Puts a key-value pair into the map. If map already contains the same key,
@@ -115,9 +116,9 @@ bool hmap_ensure_capacity         (hash_map * const map, size_t n);
  *
  * @return true if pair was successfully placed in
  */
-bool hmap_put                     (hash_map * restrict const map,
-                                   void const * restrict pair,
-                                   void const ** restrict repl);
+bool hmap_put                       (hash_map *restrict map,
+                                     const void *restrict pair,
+                                     const void **restrict repl);
 
 /**
  * Puts a key-value pair into the map only if map does not contain a pair
@@ -128,8 +129,8 @@ bool hmap_put                     (hash_map * restrict const map,
  *
  * @return true if pair was successfully placed in
  */
-bool hmap_put_if_absent           (hash_map * restrict const map,
-                                   void const * restrict pair);
+bool hmap_put_if_absent             (hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Replaces exisiting pair with the same key with a new key-value pair. Does
@@ -140,8 +141,8 @@ bool hmap_put_if_absent           (hash_map * restrict const map,
  *
  * @return Pointer to exisiting pair or NULL if no such pair exists
  */
-void const * hmap_replace         (hash_map * restrict const map,
-                                   void const * restrict pair);
+const void *hmap_replace            (hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Removes a pair with the same key
@@ -151,8 +152,8 @@ void const * hmap_replace         (hash_map * restrict const map,
  *
  * @return Pointer to removed pair or NULL if no such pair exists
  */
-void const * hmap_remove          (hash_map * restrict const map,
-                                   void const * restrict pair);
+const void *hmap_remove             (hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Checks if a pair with specified key exists
@@ -162,8 +163,8 @@ void const * hmap_remove          (hash_map * restrict const map,
  *
  * @return true if such pair exists, false otherwise
  */
-bool hmap_has_key                 (hash_map const * restrict const map,
-                                   void const * restrict pair);
+bool hmap_has_key                   (const hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Retrieves a pair with the specified key
@@ -173,8 +174,8 @@ bool hmap_has_key                 (hash_map const * restrict const map,
  *
  * @return Pointer to such pair or NULL if no such pair exists
  */
-void const * hmap_get             (hash_map const * restrict const map,
-                                   void const * restrict pair);
+const void *hmap_get                (const hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Retrieves a pair with the specified key or the default value if no such
@@ -185,8 +186,8 @@ void const * hmap_get             (hash_map const * restrict const map,
  *
  * @return Pointer to such pair or default value if no such pair exists
  */
-void const * hmap_get_or_default  (hash_map const * restrict const map,
-                                   void const * restrict pair);
+const void *hmap_get_or_default     (const hash_map *restrict map,
+                                     const void *restrict pair);
 
 /**
  * Forces the map to rehash all pairs with the new hash function. Internal
@@ -197,7 +198,8 @@ void const * hmap_get_or_default  (hash_map const * restrict const map,
  *
  * @return true if rehash was successful, false otherwise
  */
-bool hmap_rehash                  (hash_map * const map, hash_func * hasher);
+bool hmap_rehash                    (hash_map *map,
+                                     hash_func *hasher);
 
 /**
  * Iterates through every pair of the map. The state of the map, apart from
@@ -207,8 +209,8 @@ bool hmap_rehash                  (hash_map * const map, hash_func * hasher);
  * @param map - Pointer to initialized hash map
  * @param it - An action to be performed on each pair
  */
-void hmap_foreach                 (hash_map const * const map,
-                                   void (* it)(void const *));
+void hmap_foreach                   (const hash_map *map,
+                                     void (*it)(const void *));
 
 /**
  * Returns the size of the hash map
@@ -217,7 +219,7 @@ void hmap_foreach                 (hash_map const * const map,
  *
  * @return size of the hash map
  */
-size_t hmap_size                  (hash_map const * const map);
+size_t hmap_size                    (const hash_map *map);
 
 /**
  * Returns the capacity of the hash map
@@ -226,6 +228,6 @@ size_t hmap_size                  (hash_map const * const map);
  *
  * @return capacity of the hash map
  */
-size_t hmap_capacity              (hash_map const * const map);
+size_t hmap_capacity                (const hash_map *map);
 
 #endif

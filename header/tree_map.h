@@ -20,13 +20,13 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef void (tmap_it)(void const *, void const *);
-typedef int (key_cmp)(void const *, void const *);
+typedef void (tmap_it)(const void *, const void *);
+typedef int (key_cmp)(const void *, const void *);
 
 typedef struct tmap_node
 {
-  struct tmap_node * lhs; /* less than */
-  struct tmap_node * rhs; /* more than */
+  struct tmap_node *lhs; /* less than */
+  struct tmap_node *rhs; /* more than */
   char data[];
 } tmap_node;
 
@@ -35,8 +35,8 @@ typedef struct tree_map
   size_t len;
   size_t key_blk;
   size_t value_blk;
-  tmap_node * root;
-  key_cmp * key_compare;
+  tmap_node *root;
+  key_cmp *key_compare;
 } tree_map;
 
 /**
@@ -49,24 +49,24 @@ typedef struct tree_map
  *
  * @return true if key_compare is not NULL and key and value sizes are not zero
  */
-bool init_tmap                        (tree_map * const tree,
-                                       key_cmp * key_compare,
-                                       size_t key_size,
-                                       size_t value_size);
+bool init_tmap                      (tree_map *tree,
+                                     key_cmp *key_compare,
+                                     size_t key_size,
+                                     size_t value_size);
 
 /**
  * Frees a tree map, making it the same as uninitialized.
  *
  * @param tree - Pointer to initialized tree map
  */
-void free_tmap                        (tree_map * const tree);
+void free_tmap                      (tree_map *tree);
 
 /**
  * Clears a tree map by deallocating all nodes and setting size to zero.
  *
  * @param tree - Pointer to initialized tree map
  */
-void tmap_clear                       (tree_map * const tree);
+void tmap_clear                     (tree_map *tree);
 
 /**
  * Puts a key with corresponding value into the tree.
@@ -77,9 +77,9 @@ void tmap_clear                       (tree_map * const tree);
  *
  * @returns true if operation succeeded
  */
-bool tmap_put                         (tree_map * restrict const tree,
-                                       void const * restrict key,
-                                       void const * restrict value);
+bool tmap_put                       (tree_map *restrict tree,
+                                     const void *restrict key,
+                                     const void *restrict value);
 
 /**
  * Puts a key with corresponding value into the tree only if key does not
@@ -92,9 +92,9 @@ bool tmap_put                         (tree_map * restrict const tree,
  * @returns true if operation succeeded, false if key already exists or
  * memory could not be allocated
  */
-bool tmap_put_if_absent               (tree_map * restrict const tree,
-                                       void const * restrict key,
-                                       void const * restrict value);
+bool tmap_put_if_absent             (tree_map *restrict tree,
+                                     const void *restrict key,
+                                     const void *restrict value);
 
 /**
  * Removes a key along with its values
@@ -104,8 +104,8 @@ bool tmap_put_if_absent               (tree_map * restrict const tree,
  *
  * @return true if such a key was found and removed
  */
-bool tmap_remove                      (tree_map * restrict const tree,
-                                       void const * restrict key);
+bool tmap_remove                    (tree_map *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Checks if specified key exists
@@ -115,8 +115,8 @@ bool tmap_remove                      (tree_map * restrict const tree,
  *
  * @return true if such a key exists, false otherwise
  */
-bool tmap_has_key                     (tree_map const * restrict const tree,
-                                       void const * restrict key);
+bool tmap_has_key                   (const tree_map *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Returns a pointer to the value corresponding to the specified key.
@@ -126,8 +126,8 @@ bool tmap_has_key                     (tree_map const * restrict const tree,
  *
  * @return the pointer to the value or NULL
  */
-void const * tmap_get                 (tree_map const * restrict const tree,
-                                       void const * restrict key);
+const void *tmap_get                (const tree_map *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Returns a pointer to the value corresponding to the specified key. If value
@@ -139,9 +139,9 @@ void const * tmap_get                 (tree_map const * restrict const tree,
  *
  * @return the pointer to the value or the default value
  */
-void const * tmap_get_or_default      (tree_map const * restrict const tree,
-                                       void const * key,
-                                       void const * default_value);
+const void *tmap_get_or_default     (const tree_map *restrict tree,
+                                     const void *key,
+                                     const void *default_value);
 
 /**
  * Iterates through every key-value entry of the tree. The state of the tree
@@ -150,8 +150,8 @@ void const * tmap_get_or_default      (tree_map const * restrict const tree,
  * @param tree - Pointer to initialized tree map
  * @param it - An action to be performed on each entry
  */
-void tmap_foreach                     (tree_map const * const tree,
-                                       tmap_it * it);
+void tmap_foreach                   (const tree_map *tree,
+                                     tmap_it *it);
 
 /**
  * Iterates through every key-value entry of the tree that is greater than the
@@ -162,9 +162,9 @@ void tmap_foreach                     (tree_map const * const tree,
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void tmap_foreach_gt                  (tree_map const * restrict const tree,
-                                       void const * restrict key,
-                                       tmap_it * it);
+void tmap_foreach_gt                (const tree_map *restrict tree,
+                                     const void *restrict key,
+                                     tmap_it *it);
 
 /**
  * Iterates through every key-value entry of the tree that is lesser than the
@@ -175,9 +175,9 @@ void tmap_foreach_gt                  (tree_map const * restrict const tree,
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void tmap_foreach_lt                  (tree_map const * restrict const tree,
-                                       void const * restrict key,
-                                       tmap_it * it);
+void tmap_foreach_lt                (const tree_map *restrict tree,
+                                     const void *restrict key,
+                                     tmap_it *it);
 
 /**
  * Returns the size of the tree map
@@ -186,6 +186,6 @@ void tmap_foreach_lt                  (tree_map const * restrict const tree,
  *
  * @return size of the tree map
  */
-size_t tmap_size                      (tree_map const * const tree);
+size_t tmap_size                    (const tree_map *tree);
 
 #endif

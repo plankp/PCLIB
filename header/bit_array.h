@@ -35,7 +35,8 @@ typedef struct bit_array
  *
  * @returns true if bit array was successfully initialized
  */
-bool init_bitarr (bit_array *arr, size_t bits);
+bool init_bitarr                    (bit_array *arr,
+                                     size_t bits);
 
 /**
  * Initializes a bit array with the size and same set bits as another bit
@@ -46,14 +47,15 @@ bool init_bitarr (bit_array *arr, size_t bits);
  *
  * @return true if bit array was successfully initialized
  */
-bool init_cpy_bitarr (bit_array *arr, bit_array const *original);
+bool init_cpy_bitarr                (bit_array *arr,
+                                     const bit_array *original);
 
 /**
  * Destructs the bit array by freeing the underlying bit storage.
  *
  * @param arr The bit array being cleaned up
  */
-void free_bitarr (bit_array *arr);
+void free_bitarr                    (bit_array *arr);
 
 /**
  * Clears a bit array by unsetting all bits making the underlying
@@ -61,14 +63,14 @@ void free_bitarr (bit_array *arr);
  *
  * @param arr The bit array being falsed
  */
-void bitarr_clear (bit_array *arr);
+void bitarr_clear                   (bit_array *arr);
 
 /**
  * Attempts to release unused underlying storage slots.
  *
  * @param arr - The bit array being compacted
  */
-void bitarr_compact (bit_array *arr);
+void bitarr_compact                 (bit_array *arr);
 
 /**
  * Resizes the bit array to only accomodate the fixed amount of bits.
@@ -80,7 +82,8 @@ void bitarr_compact (bit_array *arr);
  *
  * @return true if resize operation was successful
  */
-bool bitarr_resize (bit_array *arr, size_t new_bits);
+bool bitarr_resize                  (bit_array *arr,
+                                     size_t new_bits);
 
 /**
  * Toggles a specific bit of a bit array. If the bit was previously
@@ -90,7 +93,8 @@ bool bitarr_resize (bit_array *arr, size_t new_bits);
  * @param arr The bit array being toggled
  * @param bit The specified bit to be toggled
  */
-void bitarr_toggle (bit_array *arr, size_t bit);
+void bitarr_toggle                  (bit_array *arr,
+                                     size_t bit);
 
 /**
  * Unsets a specific bit of a bit array. In other words, turing a
@@ -100,7 +104,8 @@ void bitarr_toggle (bit_array *arr, size_t bit);
  * @param arr The bit array being unsetted
  * @param bit The specified bit to be unsetted
  */
-void bitarr_unset (bit_array *arr, size_t bit);
+void bitarr_unset                   (bit_array *arr,
+                                     size_t bit);
 
 /**
  * Sets a specific bit of a bit array. In other words, turing a bit
@@ -110,7 +115,8 @@ void bitarr_unset (bit_array *arr, size_t bit);
  * @param arr The bit array being setted
  * @param bit The specified bit to be setted
  */
-void bitarr_set (bit_array *arr, size_t bit);
+void bitarr_set                     (bit_array *arr,
+                                     size_t bit);
 
 /**
  * Retrieves the toggle status of a specific bit in a bit array.
@@ -120,7 +126,8 @@ void bitarr_set (bit_array *arr, size_t bit);
  *
  * @returns true if bit is set, false if bit is unset
  */
-bool bitarr_get (bit_array const *arr, size_t bit);
+bool bitarr_get                     (const bit_array *arr,
+                                     size_t bit);
 
 /**
  * Returns the number of bits of the bit array.
@@ -129,7 +136,7 @@ bool bitarr_get (bit_array const *arr, size_t bit);
  *
  * @returns The number of bits of a bit array
  */
-size_t bitarr_size (bit_array const *arr);
+size_t bitarr_size                  (const bit_array *arr);
 
 /**
  * Iterates through a bit array. All bits are iterated as opposed
@@ -139,7 +146,8 @@ size_t bitarr_size (bit_array const *arr);
  * @param vis The callback function, takes a bit (bool) as
  *            parameter, returns loop_state_t
  */
-void bitarr_foreach (bit_array const *arr, void (*vis)(bool));
+void bitarr_foreach                 (const bit_array *arr,
+                                     void (*vis)(bool));
 
 /**
  * Performs a bitwise and between two arrays. Only the lhs is modified.
@@ -152,7 +160,8 @@ void bitarr_foreach (bit_array const *arr, void (*vis)(bool));
  *
  * @returns A bit array with the results
  */
-void bitarr_and (bit_array *lhs, bit_array const *rhs);
+void bitarr_and                     (bit_array *lhs,
+                                     const bit_array *rhs);
 
 /**
  * Performs a bitwise or between two arrays. Only the lhs is modified
@@ -162,7 +171,8 @@ void bitarr_and (bit_array *lhs, bit_array const *rhs);
  *
  * @returns A bit array with the results
  */
-void bitarr_or (bit_array *lhs, bit_array const *rhs);
+void bitarr_or                      (bit_array *lhs,
+                                     const bit_array *rhs);
 
 /**
  * Performs a bitwise xor between two arrays. Only the lhs is modified
@@ -171,13 +181,14 @@ void bitarr_or (bit_array *lhs, bit_array const *rhs);
  * @param rhs Bit array 2
  */
 
-void bitarr_xor (bit_array *lhs, bit_array const *rhs);
+void bitarr_xor                     (bit_array *lhs,
+                                     const bit_array *rhs);
 
 /**
  * Performs a bitwise not of an array. The original array is modified.
  *
  * @param base Bit array, will contain the result after
  */
-void bitarr_not (bit_array *base);
+void bitarr_not                     (bit_array *base);
 
 #endif

@@ -20,14 +20,14 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef void (tmset_it)(void const *, size_t);
-typedef int (key_cmp)(void const *, void const *);
+typedef void (tmset_it)(const void *, size_t);
+typedef int (key_cmp)(const void *, const void *);
 
 typedef struct tmset_node
 {
   size_t count;
-  struct tmset_node * lhs; /* less than */
-  struct tmset_node * rhs; /* more than */
+  struct tmset_node *lhs; /* less than */
+  struct tmset_node *rhs; /* more than */
   char data[];
 } tmset_node;
 
@@ -35,8 +35,8 @@ typedef struct tree_multiset
 {
   size_t len;
   size_t key_blk;
-  tmset_node * root;
-  key_cmp * key_compare;
+  tmset_node *root;
+  key_cmp *key_compare;
 } tree_multiset;
 
 /**
@@ -48,23 +48,23 @@ typedef struct tree_multiset
  *
  * @return true if key_compare is not NULL and key_size is not zero
  */
-bool init_tmset                       (tree_multiset * const tree,
-                                       key_cmp * key_compare,
-                                       size_t key_size);
+bool init_tmset                     (tree_multiset *tree,
+                                     key_cmp *key_compare,
+                                     size_t key_size);
 
 /**
  * Frees a tree multiset, making it the same as uninitialized.
  *
  * @param tree - Pointer to initialized tree multiset
  */
-void free_tmset                       (tree_multiset * const tree);
+void free_tmset                     (tree_multiset *tree);
 
 /**
  * Clears a tree multiset by deallocating all nodes and setting size to zero.
  *
  * @param tree - Pointer to initialized tree multiset
  */
-void tmset_clear                      (tree_multiset * const tree);
+void tmset_clear                    (tree_multiset *tree);
 
 /**
  * Puts a key with corresponding value into the tree.
@@ -74,8 +74,8 @@ void tmset_clear                      (tree_multiset * const tree);
  *
  * @returns true if operation succeeded
  */
-bool tmset_put                        (tree_multiset * restrict const tree,
-                                       void const * restrict key);
+bool tmset_put                      (tree_multiset *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Puts a key with corresponding value into the tree only if key does not
@@ -87,8 +87,8 @@ bool tmset_put                        (tree_multiset * restrict const tree,
  * @returns true if operation succeeded, false if key already exists or
  * memory could not be allocated
  */
-bool tmset_put_if_absent              (tree_multiset * restrict const tree,
-                                       void const * restrict key);
+bool tmset_put_if_absent            (tree_multiset *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Removes all occurrences of a key
@@ -98,8 +98,8 @@ bool tmset_put_if_absent              (tree_multiset * restrict const tree,
  *
  * @return true if such a key was found and removed
  */
-bool tmset_remove                     (tree_multiset * restrict const tree,
-                                       void const * restrict key);
+bool tmset_remove                   (tree_multiset *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Removes specified occurrences of a key. If occurrences specified is more
@@ -112,9 +112,9 @@ bool tmset_remove                     (tree_multiset * restrict const tree,
  *
  * @return the actual amount of matching keys removed
  */
-size_t tmset_remove_count             (tree_multiset * restrict const tree,
-                                       void const * restrict key,
-                                       size_t const count);
+size_t tmset_remove_count           (tree_multiset *restrict tree,
+                                     const void *restrict key,
+                                     size_t count);
 
 /**
  * Checks if specified key exists
@@ -124,8 +124,8 @@ size_t tmset_remove_count             (tree_multiset * restrict const tree,
  *
  * @return true if such a key exists, false otherwise
  */
-bool tmset_has_key                     (tree_multiset const * restrict const tree,
-                                       void const * restrict key);
+bool tmset_has_key                  (const tree_multiset *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Checks the number of keys that match of the specified key
@@ -135,18 +135,18 @@ bool tmset_has_key                     (tree_multiset const * restrict const tre
  *
  * @return the number of matching keys
  */
-size_t tmset_count_matches             (tree_multiset const * restrict const tree,
-                                       void const * restrict key);
+size_t tmset_count_matches          (const tree_multiset *restrict tree,
+                                     const void *restrict key);
 
 /**
  * Iterates through every key of the tree in sorted order. The state of the
- * tree should be kept consistent during the iteration process.
+ *tree should be kept consistent during the iteration process.
  *
  * @param tree - Pointer to initialized tree set
  * @param it - An action to be performed on each entry
  */
-void tmset_foreach                     (tree_multiset const * const tree,
-                                       tmset_it * it);
+void tmset_foreach                  (const tree_multiset *tree,
+                                     tmset_it *it);
 
 /**
  * Iterates through every key of the tree that is greater than the specified
@@ -157,9 +157,9 @@ void tmset_foreach                     (tree_multiset const * const tree,
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void tmset_foreach_gt                  (tree_multiset const * restrict const tree,
-                                       void const * restrict key,
-                                       tmset_it * it);
+void tmset_foreach_gt               (const tree_multiset *restrict tree,
+                                     const void *restrict key,
+                                     tmset_it *it);
 
 /**
  * Iterates through every key of the tree that is lesser than the specified
@@ -170,9 +170,9 @@ void tmset_foreach_gt                  (tree_multiset const * restrict const tre
  * @param it - An action to be performed on each entry
  * @param key - Key being compared
  */
-void tmset_foreach_lt                  (tree_multiset const * restrict const tree,
-                                       void const * restrict key,
-                                       tmset_it * it);
+void tmset_foreach_lt               (const tree_multiset *restrict tree,
+                                     const void *restrict key,
+                                     tmset_it *it);
 
 /**
  * Returns the size of the tree multiset
@@ -181,6 +181,6 @@ void tmset_foreach_lt                  (tree_multiset const * restrict const tre
  *
  * @return size of the tree multiset
  */
-size_t tmset_size                      (tree_multiset const * const tree);
+size_t tmset_size                   (const tree_multiset *tree);
 
 #endif

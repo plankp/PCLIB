@@ -31,15 +31,15 @@ typedef struct closure closure;
  *
  * @return NULL if closure object cannot be allocated
  */
-closure *new_closure      (void *(*fptr)(closure *, size_t, void *),
-                           size_t data_size);
+closure *new_closure                (void *(*fptr)(closure *, size_t, void *),
+                                     size_t data_size);
 
 /**
  * Destroys a closure object
  *
  * @param clos - Closure object being destroyed
  */
-void delete_closure       (closure *clos);
+void delete_closure                 (closure *clos);
 
 /**
  * Copies data into data space of closure object
@@ -48,9 +48,9 @@ void delete_closure       (closure *clos);
  * @param buf - Source of data
  * @param data_size - Number of bytes to copy
  */
-void closure_set_data     (closure *restrict clos,
-                           const void *restrict buf,
-                           size_t data_size);
+void closure_set_data               (closure *restrict clos,
+                                     const void *restrict buf,
+                                     size_t data_size);
 
 /**
  * Retrieves the pointer to the head of the data space
@@ -59,7 +59,7 @@ void closure_set_data     (closure *restrict clos,
  *
  * @return data space of the closure
  */
-void *closure_get_data    (closure *clos);
+void *closure_get_data              (closure *clos);
 
 /**
  * Applies/invokes the closure object by performing the behaviour defined.
@@ -70,8 +70,8 @@ void *closure_get_data    (closure *clos);
  *
  * @return result of the behaviour tied to the closure
  */
-void *closure_apply     (closure *clos,
-                         size_t sz,
-                         void *argv);
+void *closure_apply                 (closure *clos,
+                                     size_t sz,
+                                     void *argv);
 
 #endif

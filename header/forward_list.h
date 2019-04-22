@@ -22,7 +22,7 @@
 
 typedef struct forward_entry
 {
-  struct forward_entry * next;
+  struct forward_entry *next;
   char data[];
 } forward_entry;
 
@@ -30,7 +30,7 @@ typedef struct forward_list
 {
   size_t len;
   size_t blk;
-  forward_entry * mem;
+  forward_entry *mem;
 } forward_list;
 
 /**
@@ -42,28 +42,29 @@ typedef struct forward_list
  *
  * @return true if data_size was at least 1
  */
-bool init_fwdlist         (forward_list * const list, size_t data_size);
+bool init_fwdlist                   (forward_list *list,
+                                     size_t data_size);
 
 /**
  * Frees a forward list, making it the same as uninitialized.
  *
  * @param list - Pointer to initialized forward list
  */
-void free_fwdlist         (forward_list * const list);
+void free_fwdlist                   (forward_list *list);
 
 /**
  * Clears the forward list
  *
  * @param list - Pointer to initialized forward list
  */
-void fwdlist_clear        (forward_list * const list);
+void fwdlist_clear                  (forward_list *list);
 
 /**
  * Reverses a forward list
  *
  * @param list - Pointer to initialized forward list
  */
-void fwdlist_reverse      (forward_list * const list);
+void fwdlist_reverse                (forward_list *list);
 
 /**
  * Sorts the forward list
@@ -71,8 +72,8 @@ void fwdlist_reverse      (forward_list * const list);
  * @param list - Pointer to initialized forward list
  * @param comp - Comparator
  */
-void fwdlist_sort         (forward_list * const list,
-                           int (* comp)(void const *, void const *));
+void fwdlist_sort                   (forward_list *list,
+                                     int (*comp)(const void *, const void *));
 
 /**
  * Iterates through every item of the list. The state of the list should be
@@ -81,8 +82,8 @@ void fwdlist_sort         (forward_list * const list,
  * @param list - Pointer to initialized forward list
  * @param it - An action to be performed on each item
  */
-void fwdlist_foreach      (forward_list const * const list,
-                           void (* it)(void const *));
+void fwdlist_foreach                (const forward_list *list,
+                                     void (*it)(const void *));
 
 /**
  * Returns the size of the forward list
@@ -91,7 +92,7 @@ void fwdlist_foreach      (forward_list const * const list,
  *
  * @return size of the forward list
  */
-size_t fwdlist_size       (forward_list const * const list);
+size_t fwdlist_size                 (const forward_list *list);
 
 /**
  * Inserts a new element to the front of the forward list
@@ -101,8 +102,8 @@ size_t fwdlist_size       (forward_list const * const list);
  *
  * @return true if process was successful
  */
-bool fwdlist_add_first          (forward_list * restrict const list,
-                                 void const * restrict el);
+bool fwdlist_add_first              (forward_list *restrict list,
+                                     const void *restrict el);
 
 /**
  * Removes an element from the front of the forward list
@@ -113,8 +114,8 @@ bool fwdlist_add_first          (forward_list * restrict const list,
  *
  * @return true if process was successful
  */
-bool fwdlist_remove_first       (forward_list * restrict const list,
-                                 void * restrict out);
+bool fwdlist_remove_first           (forward_list *restrict list,
+                                     void *restrict out);
 
 /**
  * Returns pointer to the data of the first element of the forward list
@@ -123,7 +124,7 @@ bool fwdlist_remove_first       (forward_list * restrict const list,
  *
  * @return pointer to the data, NULL if list is empty
  */
-void const * fwdlist_get_first  (forward_list const * const list);
+void const *fwdlist_get_first       (const forward_list *list);
 
 /**
  * Remove all matching elements from the forward list
@@ -133,8 +134,8 @@ void const * fwdlist_get_first  (forward_list const * const list);
  *
  * @return number of elements removed
  */
-size_t fwdlist_remove_match     (forward_list * restrict const list,
-                                 void const * restrict const out);
+size_t fwdlist_remove_match         (forward_list *restrict list,
+                                     const void *restrict out);
 
 /**
  * Remove all matching elements from the forward list
@@ -144,7 +145,7 @@ size_t fwdlist_remove_match     (forward_list * restrict const list,
  *
  * @return number of elements removed
  */
-size_t fwdlist_remove_if        (forward_list * const list,
-                                 bool (* pred)(void const *));
+size_t fwdlist_remove_if            (forward_list *list,
+                                     bool (*pred)(const void *));
 
 #endif

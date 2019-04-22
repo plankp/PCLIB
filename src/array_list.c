@@ -20,7 +20,7 @@
 #include <string.h>
 
 bool init_arrlist
-(array_list * const list, size_t data_size)
+(array_list *list, size_t data_size)
 {
   if (data_size < 1)
   {
@@ -35,7 +35,7 @@ bool init_arrlist
 }
 
 void free_arrlist
-(array_list * const list)
+(array_list *list)
 {
   if (list->cap > 0)
   {
@@ -47,19 +47,19 @@ void free_arrlist
   }
 }
 
-void * cpy_free_arrlist
-(array_list * const list)
+void *cpy_free_arrlist
+(array_list *list)
 {
   if (list->len == 0)
   {
     /* allocate a one byte long buffer */
-    void * ptr = calloc(1, sizeof(char));
+    void *ptr = calloc(1, sizeof(char));
     free_arrlist(list);
     return ptr;
   }
 
   /* return the internal buffer directly */
-  void * ptr = list->mem;
+  void *ptr = list->mem;
   list->len = 0;
   list->cap = 0;
   list->mem = NULL;
@@ -67,13 +67,13 @@ void * cpy_free_arrlist
 }
 
 void arrlist_clear
-(array_list * const list)
+(array_list *list)
 {
   list->len = 0;
 }
 
 void arrlist_compact
-(array_list * const list)
+(array_list *list)
 {
   size_t len = list->len;
   if (list->cap == len)
@@ -89,7 +89,7 @@ void arrlist_compact
     return;
   }
 
-  char * new_mem = realloc(list->mem, len * list->blk);
+  char *new_mem = realloc(list->mem, len * list->blk);
   if (new_mem != NULL)
   {
     /* update cap if memory is resized */
@@ -101,7 +101,7 @@ void arrlist_compact
 }
 
 bool arrlist_ensure_capacity
-(array_list * const list, size_t n)
+(array_list *list, size_t n)
 {
   if (list->cap >= n)
   {
@@ -110,7 +110,7 @@ bool arrlist_ensure_capacity
 
   /* resize list to at least n */
   size_t new_cap = ARRLIST_GROW(n);
-  char * new_mem = realloc(list->mem, new_cap * list->blk);
+  char *new_mem = realloc(list->mem, new_cap * list->blk);
   if (new_mem == NULL)
   {
     return false;
@@ -122,7 +122,7 @@ bool arrlist_ensure_capacity
 }
 
 void arrlist_reverse
-(array_list * const list)
+(array_list *list)
 {
   size_t const len = list->len;
   size_t const midpoint = len / 2;
@@ -132,8 +132,8 @@ void arrlist_reverse
   for (size_t i = 0; i < midpoint; ++i)
   {
     /* swap [i] with [len - i - 1] */
-    char * const near = list->mem + i * blk;
-    char * const far = list->mem + (len - i - 1) * blk;
+    char *const near = list->mem + i * blk;
+    char *const far = list->mem + (len - i - 1) * blk;
     memcpy(temp_buf, near, blk);
     memmove(near, far, blk);
     memcpy(far, temp_buf, blk);
@@ -141,7 +141,7 @@ void arrlist_reverse
 }
 
 bool arrlist_add
-(array_list * restrict const list, void const * restrict el)
+(array_list *restrict list, const void *restrict el)
 {
   if (!arrlist_ensure_capacity(list, list->len + 1))
   {
@@ -154,7 +154,7 @@ bool arrlist_add
 }
 
 bool arrlist_insert
-(array_list * restrict const list, size_t index, void const * restrict el)
+(array_list *restrict list, size_t index, const void *restrict el)
 {
   size_t len = list->len;
   if (index > len)
@@ -174,7 +174,7 @@ bool arrlist_insert
   }
 
   /* shift the indicies after towards end */
-  char * offset = &list->mem[index * list->blk];
+  char *offset = &list->mem[index * list->blk];
   memmove(offset + list->blk, offset, (list->len - index) * list->blk);
   memcpy(offset, el, list->blk);
   ++list->len;
@@ -182,11 +182,11 @@ bool arrlist_insert
 }
 
 bool arrlist_set
-(array_list * restrict const list, size_t index, void const * restrict el, void * restrict out)
+(array_list *restrict list, size_t index, const void *restrict el, void *restrict out)
 {
   if (index < list->len)
   {
-    char * offset = &list->mem[index * list->blk];
+    char *offset = &list->mem[index * list->blk];
     if (out != NULL)
     {
       memmove(out, offset, list->blk);
@@ -200,12 +200,12 @@ bool arrlist_set
 }
 
 bool arrlist_remove
-(array_list * restrict const list, size_t index, void * restrict out)
+(array_list *restrict list, size_t index, void *restrict out)
 {
   if (index < list->len)
   {
     /* shift the indicies after towards head */
-    char * offset = &list->mem[index * list->blk];
+    char *offset = &list->mem[index * list->blk];
     if (out != NULL)
     {
       memmove(out, offset, list->blk);
@@ -220,7 +220,7 @@ bool arrlist_remove
 }
 
 void arrlist_foreach
-(array_list const * const list, void (* it)(void const *))
+(const array_list *list, void (*it)(const void *))
 {
   for (size_t i = 0; i < list->len; ++i)
   {
@@ -228,8 +228,8 @@ void arrlist_foreach
   }
 }
 
-void const * arrlist_get
-(array_list const * const list, size_t index)
+void const *arrlist_get
+(const array_list *list, size_t index)
 {
   if (index < list->len)
   {
@@ -240,31 +240,31 @@ void const * arrlist_get
 }
 
 size_t arrlist_size
-(array_list const * const list)
+(const array_list *list)
 {
   return list->len;
 }
 
 size_t arrlist_capacity
-(array_list const * const list)
+(const array_list *list)
 {
   return list->cap;
 }
 
-void * arrlist_data
-(array_list * const list)
+void *arrlist_data
+(array_list *list)
 {
   return list->mem;
 }
 
 bool arrlist_remove_first
-(array_list * restrict const list, void * restrict out)
+(array_list *restrict list, void *restrict out)
 {
   return arrlist_remove(list, 0, out);
 }
 
 bool arrlist_remove_last
-(array_list * restrict const list, void * restrict out)
+(array_list *restrict list, void *restrict out)
 {
   const size_t len = list->len;
 

@@ -20,7 +20,7 @@
 #include <string.h>
 
 void init_strbuf
-(string_buffer * const buffer)
+(string_buffer *buffer)
 {
   buffer->len = 0;
   buffer->cap = 0;
@@ -28,7 +28,7 @@ void init_strbuf
 }
 
 void free_strbuf
-(string_buffer * const buffer)
+(string_buffer *buffer)
 {
   if (buffer->cap > 0)
   {
@@ -40,30 +40,30 @@ void free_strbuf
   }
 }
 
-char * strbuf_copy
-(string_buffer const * const buffer)
+char *strbuf_copy
+(const string_buffer *buffer)
 {
   size_t length = buffer->len;
-  char * cpy = malloc((length + 1) * sizeof(char));
+  char *cpy = malloc(length + 1);
   memcpy(cpy, buffer->mem, length);
   cpy[length + 1] = '\0';
   return cpy;
 }
 
-char * cpy_free_strbuf
-(string_buffer * const buffer)
+char *cpy_free_strbuf
+(string_buffer *buffer)
 {
   size_t length = buffer->len;
   if (length == 0)
   {
     /* allocate an empty string */
-    char * cpy = calloc(1, sizeof(char));
+    char *cpy = calloc(1, sizeof(char));
     free_strbuf(buffer);
     return cpy;
   }
 
   /* internal buffer is well formed, so just return that */
-  char * ptr = buffer->mem;
+  char *ptr = buffer->mem;
   buffer->len = 0;
   buffer->cap = 0;
   buffer->mem = NULL;
@@ -71,13 +71,13 @@ char * cpy_free_strbuf
 }
 
 void strbuf_clear
-(string_buffer * const buffer)
+(string_buffer *buffer)
 {
   buffer->mem[buffer->len = 0] = '\0';
 }
 
 void strbuf_compact
-(string_buffer * const buffer)
+(string_buffer *buffer)
 {
   size_t len = buffer->len;
   if (buffer->cap == len)
@@ -93,7 +93,7 @@ void strbuf_compact
     return;
   }
 
-  char * new_mem = realloc(buffer->mem, (len + 1) * sizeof(char));
+  char *new_mem = realloc(buffer->mem, len + 1);
   if (new_mem != NULL)
   {
     /* update cap if memory is resized */
@@ -105,7 +105,7 @@ void strbuf_compact
 }
 
 bool strbuf_ensure_capacity
-(string_buffer * const buffer, size_t n)
+(string_buffer *buffer, size_t n)
 {
   if (buffer->cap >= n)
   {
@@ -114,7 +114,7 @@ bool strbuf_ensure_capacity
 
   /* resize buffer to at least n + 1 (null byte) */
   size_t new_cap = STRBUF_GROW(n + 1);
-  char * new_mem = realloc(buffer->mem, new_cap * sizeof(char));
+  char *new_mem = realloc(buffer->mem, new_cap);
   if (new_mem == NULL)
   {
     return false;
@@ -126,7 +126,7 @@ bool strbuf_ensure_capacity
 }
 
 bool strbuf_append_ch
-(string_buffer * const buffer, char ch)
+(string_buffer *buffer, char ch)
 {
   if (!strbuf_ensure_capacity(buffer, buffer->len + 1))
   {
@@ -139,7 +139,7 @@ bool strbuf_append_ch
 }
 
 bool strbuf_append_nstr
-(string_buffer *restrict const buffer, char const *restrict str, size_t const count)
+(string_buffer *restrict buffer, const char *restrict str, size_t count)
 {
   if (!strbuf_ensure_capacity(buffer, buffer->len + count))
   {
@@ -152,25 +152,25 @@ bool strbuf_append_nstr
 }
 
 bool strbuf_append_str
-(string_buffer *restrict const buffer, char const *restrict str)
+(string_buffer *restrict buffer, const char *restrict str)
 {
   return strbuf_append_nstr(buffer, str, strlen(str));
 }
 
 size_t strbuf_size
-(string_buffer const * const buffer)
+(const string_buffer *buffer)
 {
   return buffer->len;
 }
 
 size_t strbuf_capacity
-(string_buffer const * const buffer)
+(const string_buffer *buffer)
 {
   return buffer->cap;
 }
 
 char * strbuf_data
-(string_buffer const * const buffer)
+(const string_buffer *buffer)
 {
   return buffer->mem == NULL ? "" : buffer->mem;
 }

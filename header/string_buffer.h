@@ -45,14 +45,14 @@ typedef struct string_buffer
  *
  * @param buffer - Pointer to an uninitialized string buffer
  */
-void init_strbuf            (string_buffer * const buffer);
+void init_strbuf            (string_buffer *buffer);
 
 /**
  * Frees a string buffer, making it the same as uninitialized.
  *
  * @param buffer - Pointer to initialized string buffer
  */
-void free_strbuf            (string_buffer * const buffer);
+void free_strbuf            (string_buffer *buffer);
 
 /**
  * Duplicates the internal string.
@@ -61,7 +61,7 @@ void free_strbuf            (string_buffer * const buffer);
  *
  * @return duplicated string, must be freed later
  */
-char * strbuf_copy          (string_buffer const * const buffer);
+char *strbuf_copy           (const string_buffer *buffer);
 
 /**
  * Duplicates the internal string then frees the string buffer, making it the
@@ -71,7 +71,7 @@ char * strbuf_copy          (string_buffer const * const buffer);
  *
  * @return duplicated string, must be freed later
  */
-char * cpy_free_strbuf      (string_buffer * const buffer);
+char *cpy_free_strbuf       (string_buffer *buffer);
 
 /**
  * Clears the string buffer by setting the size to zero. To release unused
@@ -79,7 +79,7 @@ char * cpy_free_strbuf      (string_buffer * const buffer);
  *
  * @param buffer - Pointer to initialized string buffer
  */
-void strbuf_clear           (string_buffer * const buffer);
+void strbuf_clear           (string_buffer *buffer);
 
 /**
  * Attempts to release unused parts of the buffer; in other words, tries to
@@ -87,7 +87,7 @@ void strbuf_clear           (string_buffer * const buffer);
  *
  * @param buffer - Pointer to initialized string buffer
  */
-void strbuf_compact         (string_buffer * const buffer);
+void strbuf_compact         (string_buffer *buffer);
 
 /**
  * Ensures the capacity is at least n.
@@ -98,7 +98,8 @@ void strbuf_compact         (string_buffer * const buffer);
  * @return true if capacity was already at least n or the internal buffer was
  * able to be allocated successfully
  */
-bool strbuf_ensure_capacity (string_buffer * const buffer, size_t n);
+bool strbuf_ensure_capacity (string_buffer *buffer,
+                             size_t n);
 
 /**
  * Appends a character to the end of the buffer
@@ -108,7 +109,8 @@ bool strbuf_ensure_capacity (string_buffer * const buffer, size_t n);
  *
  * @return true if operation succedded
  */
-bool strbuf_append_ch       (string_buffer * const buffer, char ch);
+bool strbuf_append_ch       (string_buffer *buffer,
+                             char ch);
 
 /**
  * Appends a string to the end of the buffer
@@ -118,8 +120,8 @@ bool strbuf_append_ch       (string_buffer * const buffer, char ch);
  *
  * @return true if operation succedded
  */
-bool strbuf_append_str      (string_buffer * restrict const buffer,
-                             char const * restrict str);
+bool strbuf_append_str      (string_buffer *restrict buffer,
+                             const char *restrict str);
 
 /**
  * Appends a specified number of characters of a string to the end of the
@@ -131,9 +133,9 @@ bool strbuf_append_str      (string_buffer * restrict const buffer,
  *
  * @return true if operation succedded
  */
-bool strbuf_append_nstr     (string_buffer * restrict const buffer,
-                             char const * restrict str,
-                             size_t const count);
+bool strbuf_append_nstr     (string_buffer *restrict buffer,
+                             const char *restrict str,
+                             size_t count);
 
 /**
  * Returns the size of the string buffer
@@ -142,7 +144,7 @@ bool strbuf_append_nstr     (string_buffer * restrict const buffer,
  *
  * @return size of the string buffer
  */
-size_t strbuf_size          (string_buffer const * const buffer);
+size_t strbuf_size          (const string_buffer *buffer);
 
 /**
  * Returns the capacity of the string buffer
@@ -151,7 +153,7 @@ size_t strbuf_size          (string_buffer const * const buffer);
  *
  * @return capacity of the string buffer
  */
-size_t strbuf_capacity      (string_buffer const * const buffer);
+size_t strbuf_capacity      (const string_buffer *buffer);
 
 /**
  * Returns a pointer to the first character
@@ -160,6 +162,6 @@ size_t strbuf_capacity      (string_buffer const * const buffer);
  *
  * @return pointer to the first character, must not be freed
  */
-char * strbuf_data          (string_buffer const * const buffer);
+char *strbuf_data           (const string_buffer *buffer);
 
 #endif

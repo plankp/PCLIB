@@ -2,18 +2,10 @@
 
 #include <string.h>
 
-void make_max_heap
-(void *gptr, size_t count, size_t size, int (*cmp)(const void *, const void *))
+static
+void heapify
+(char *ptr, size_t count, size_t size, int (*cmp)(const void *, const void *), char *swap_buf)
 {
-  /* Heap:
-   *   A      A [0=2n]
-   *  / \     B [1=2n+1]
-   * B   C    C [2=2n+2]
-   *    / \   D
-   *   D   E  E
-   */
-  char *ptr = gptr;
-  char swap_buf[size];
   for (size_t i = 1; i < count; ++i)
   {
     /*
@@ -47,5 +39,41 @@ void make_max_heap
       child = parent;
       parent = &ptr[size * plevel];
     }
+  }
+}
+
+void make_max_heap
+(void *gptr, size_t count, size_t size, int (*cmp)(const void *, const void *))
+{
+  /* Heap:
+   *   A      A [0=2n]
+   *  / \     B [1=2n+1]
+   * B   C    C [2=2n+2]
+   *    / \   D
+   *   D   E  E
+   */
+  char swap_buf[size];
+  heapify(gptr, count, size, cmp, swap_buf);
+}
+
+void heapsort
+(void *gptr, size_t count, size_t size, int (*cmp)(const void *, const void *))
+{
+  /* convert array to maximum heap */
+  make_max_heap(gptr, count, size, cmp);
+
+  /* shuffle the reverse of gptr */
+  char *ptr = gptr;
+  char swap_buf[size];
+
+  for (size_t i = count; i > 0; )
+  {
+    char *slot = &ptr[--i * size];
+
+    memcpy(swap_buf, slot, size);
+    memmove(slot, ptr, size);
+    memcpy(ptr, swap_buf, size);
+
+    heapify(gptr, i, size, cmp, swap_buf);
   }
 }

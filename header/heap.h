@@ -33,4 +33,17 @@ void make_max_heap                    (void *ptr,
                                        size_t size,
                                        int (*cmp)(const void *, const void *));
 
+/**
+ * Sorts the array in-place using a heap
+ *
+ * @param ptr - Array being sorted in-place
+ * @param count - Number of elements being processed in the array
+ * @param size - Size of each element
+ * @param cmp - Comparator function
+ */
+void heapsort                         (void *ptr,
+                                       size_t count,
+                                       size_t size,
+                                       int (*cmp)(const void *, const void *));
+
 #endif
